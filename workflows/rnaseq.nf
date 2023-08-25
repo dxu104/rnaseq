@@ -394,7 +394,7 @@ ch_samples_single_end = ch_filtered_reads
 // Create samples file of double end data for Trinity normalization
 ch_samples_double_end = ch_filtered_reads
     .filter { meta, path ->
-        meta.single_end == false || meta.single_end == null  // 考虑到single_end可能未定义的情况
+        meta.single_end == false || meta.single_end == null  // null is for the case of undefined
     }
     .map { meta, path ->
         def read1 = path[0].toString()
