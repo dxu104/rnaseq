@@ -33,7 +33,7 @@ path("results_trinity/insilico_read_normalization_altogether/*.norm.*.fq"), emit
     Trinity \\
         --seqType fq \\
         --samples_file $samples_file \\
-        --max_memory 10G --CPU 4 \\
+        --max_memory 200G --CPU 16 \\
         --output results_trinity \\
         --normalize_by_read_set \\
         --just_normalize_reads
