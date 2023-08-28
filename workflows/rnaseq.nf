@@ -417,8 +417,8 @@ ch_samples_double_end.view { txt ->
 
 TrinityNormalizeReads_SingleEnd(ch_samples_single_end)
 TrinityNormalizeReads_DoubleEnd(ch_samples_double_end)
-ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd.out.normalized_files
-ch_normalized_double_end_files = TrinityNormalizeReads_DoubleEnd.out.normalized_files
+def ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd.out.normalized_files
+def ch_normalized_double_end_files = TrinityNormalizeReads_DoubleEnd.out.normalized_files
 //ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd(ch_samples_single_end) is not best practice.
 
 
