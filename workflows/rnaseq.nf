@@ -1017,3 +1017,14 @@ workflow.onComplete {
     THE END
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
+//cd /compbio/scratch/dxu/newrnaseq/rnaseq
+//git branch
+//git checkout branchname
+//git fetch origin
+// git merge origin/master or git merge origin/developbrach
+// sudo nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test_full,docker --outdir /compbio/scratch/dxu/newrnaseq/ -stub-run
+// nohup sudo nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test_full,docker --outdir /compbio/scratch/dxu/newrnaseq/ -stub-run &> nextflow.out&
+
+//cat nextflow.out
+////tail nextflow.out
