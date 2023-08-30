@@ -1028,3 +1028,6 @@ workflow.onComplete {
 
 //cat nextflow.out
 ////tail nextflow.out
+//ps aux |grep nextflow
+// top  ctrl+S to lock the screen
+//kill -9  1234
