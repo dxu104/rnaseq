@@ -30,7 +30,7 @@ include { GTF2BED                              } from '../../modules/local/gtf2b
 include { CAT_ADDITIONAL_FASTA                 } from '../../modules/local/cat_additional_fasta'
 include { GTF_GENE_FILTER                      } from '../../modules/local/gtf_gene_filter'
 include { STAR_GENOMEGENERATE_IGENOMES         } from '../../modules/local/star_genomegenerate_igenomes'
-
+// 理解take  https://www.nextflow.io/docs/latest/dsl2.html?highlight=workflow#workflow-parameters
 workflow PREPARE_GENOME {
     take:
     fasta                //      file: /path/to/genome.fasta
@@ -44,13 +44,14 @@ workflow PREPARE_GENOME {
     star_index           // directory: /path/to/star/index/
     rsem_index           // directory: /path/to/rsem/index/
     salmon_index         // directory: /path/to/salmon/index/
-    hisat2_index         // directory: /path/to/hisat2/index/ 
+    hisat2_index         // directory: /path/to/hisat2/index/
     bbsplit_index        // directory: /path/to/rsem/index/
     gencode              //   boolean: whether the genome is from GENCODE
     is_aws_igenome       //   boolean: whether the genome files are from AWS iGenomes
     biotype              //    string: if additional fasta file is provided biotype value to use when appending entries to GTF file
     prepare_tool_indices //      list: tools to prepare indices for
 
+//笔记 When the take keyword is used, the beginning of the workflow body must be identified with the main keyword.
     main:
 
     ch_versions = Channel.empty()
@@ -127,7 +128,7 @@ workflow PREPARE_GENOME {
         } else {
             ch_transcript_fasta = Channel.value(file(transcript_fasta))
         }
-        if (gencode) { 
+        if (gencode) {
             PREPROCESS_TRANSCRIPTS_FASTA_GENCODE ( ch_transcript_fasta )
             ch_transcript_fasta = PREPROCESS_TRANSCRIPTS_FASTA_GENCODE.out.fasta
             ch_versions         = ch_versions.mix(PREPROCESS_TRANSCRIPTS_FASTA_GENCODE.out.versions)
