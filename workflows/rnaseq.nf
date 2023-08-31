@@ -375,12 +375,25 @@ workflow RNASEQ {
         .view{ "Meta: ${it[0]}, Path: ${it[1]}" }
         .set { ch_filtered_reads }
 
+        ch_sortmerna_multiqc = SORTMERNA.out.log
+        ch_versions = ch_versions.mix(SORTMERNA.out.versions.first())
+}
     //  we do not need the header, but good to know the content.
     //    Channel
     // .value(['id', 'strandedness', 'read_1', 'read_2'].join('\t'))
     // .set { ch_header }
 
     // Create samples file of single end data for Trinity normalization
+    // ch_samples_single_end = ch_filtered_reads
+    // .filter { meta, path ->
+    //     meta.single_end == true
+    // }
+    // .map { meta, path ->
+    //     def read1 = path.toString().replaceFirst("^/", "s3://")
+    //     return [meta.id, "${meta.id}_${meta.strandedness}", read1, ""].join('\t')
+    // }
+    // .collectFile(name: 'samples_single_end.txt', newLine: true, sort: true)
+
 ch_samples_single_end = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == true
@@ -392,6 +405,18 @@ ch_samples_single_end = ch_filtered_reads
     .collectFile(name: 'samples_single_end.txt', newLine: true, sort: true)
 
 // Create samples file of double end data for Trinity normalization
+
+// ch_samples_double_end = ch_filtered_reads
+//     .filter { meta, path ->
+//         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
+//     }
+//     .map { meta, path ->
+//         def read1 = path[0].toString().replaceFirst("^/", "s3://")
+//         def read2 = path[1].toString().replaceFirst("^/", "s3://")
+//         return [meta.id, "${meta.id}_${meta.strandedness}", read1, read2].join('\t')
+//     }
+//     .collectFile(name: 'samples_double_end.txt', newLine: true, sort: true)
+
 ch_samples_double_end = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
@@ -402,6 +427,10 @@ ch_samples_double_end = ch_filtered_reads
         return [meta.id, "${meta.id}_${meta.strandedness}", read1, read2].join('\t')
     }
     .collectFile(name: 'samples_double_end.txt', newLine: true, sort: true)
+
+
+
+
 
     //delete storeDir option .,then samples.txt will be in the work directory like 3c/d2lj4l2j2l424
     //collectFile(name: 'samples.txt', newLine: true, storeDir:"${params.outdir}/sortmerna", sort:true)
@@ -430,7 +459,7 @@ TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { file ->
     "Normalized Double End File Name: $file.name | Path: $file"
 }
 
-}
+
 
 // Mapping for single-end files
 ch_normalized_single_end_files_to_filtered = ch_normalized_single_end_files
@@ -1018,8 +1047,8 @@ workflow.onComplete {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-//cd /compbio/scratch/dxu/newrnaseq/rnaseq
-//git branch
+// cd /compbio/scratch/dxu/newrnaseq/rnaseq
+// git branch
 //git checkout branchname
 //git fetch origin
 // git merge origin/master or git merge origin/developbrach
