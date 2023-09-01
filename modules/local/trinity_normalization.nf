@@ -16,10 +16,21 @@ process TrinityNormalizeReads {
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/trinity:2.13.2--h00214ad_1':
         'biocontainers/trinity:2.13.2--h00214ad_1' }"
+input:
+    tuple val(meta), path(reads, stageAs: "input*/*")
 
+    script:
+    def samples_list = reads.collect { r ->
+        def r1 = r[0]
+        def r2 = r.size() > 1 ? r[1] : ""
+        "${meta.id}\t${meta.id}_${meta.strandedness}\t${r1}\t${r2}".trim()
+    }
+    def samples_file_content = samples_list.join("\n")
+    def samples_file = "samples.txt"
+    samples_file_content.toFile(samples_file)
 
-    input:
-     path samples_file
+    // input:
+    //  path samples_file
 
     // Outputs
 //    output:

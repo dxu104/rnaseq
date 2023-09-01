@@ -394,15 +394,15 @@ workflow RNASEQ {
     // }
     // .collectFile(name: 'samples_single_end.txt', newLine: true, sort: true)
 
-ch_samples_single_end = ch_filtered_reads
-    .filter { meta, path ->
-        meta.single_end == true
-    }
-    .map { meta, path ->
-        def read1 = path.toString()
-        return [meta.id, "${meta.id}_${meta.strandedness}", read1, ""].join('\t')
-    }
-    .collectFile(name: 'samples_single_end.txt', newLine: true, sort: true)
+// ch_samples_single_end = ch_filtered_reads
+//     .filter { meta, path ->
+//         meta.single_end == true
+//     }
+//     .map { meta, path ->
+//         def read1 = path.toString()
+//         return [meta.id, "${meta.id}_${meta.strandedness}", read1, ""].join('\t')
+//     }
+//     .collectFile(name: 'samples_single_end.txt', newLine: true, sort: true)
 
 // Create samples file of double end data for Trinity normalization
 
@@ -417,18 +417,27 @@ ch_samples_single_end = ch_filtered_reads
 //     }
 //     .collectFile(name: 'samples_double_end.txt', newLine: true, sort: true)
 
+// ch_samples_double_end = ch_filtered_reads
+//     .filter { meta, path ->
+//         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
+//     }
+//     .map { meta, path ->
+//         def read1 = path[0].toString()
+//         def read2 = path[1].toString()
+//         return [meta.id, "${meta.id}_${meta.strandedness}", read1, read2].join('\t')
+//     }
+//     .collectFile(name: 'samples_double_end.txt', newLine: true, sort: true)
+
+
+ch_samples_single_end = ch_filtered_reads
+    .filter { meta, path ->
+        meta.single_end == true
+    }
+
 ch_samples_double_end = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
     }
-    .map { meta, path ->
-        def read1 = path[0].toString()
-        def read2 = path[1].toString()
-        return [meta.id, "${meta.id}_${meta.strandedness}", read1, read2].join('\t')
-    }
-    .collectFile(name: 'samples_double_end.txt', newLine: true, sort: true)
-
-
 
 
 
