@@ -1114,3 +1114,4 @@ workflow.onComplete {
 //ps aux |grep nextflow
 // top  ctrl+S to lock the screen
 //kill -9  1234
+//workDir = 's3://mdibl-nextflow-work/dxu/ZebraFishTestWorkDir/'
