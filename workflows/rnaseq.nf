@@ -106,6 +106,10 @@ include { TrinityNormalizeReads as TrinityNormalizeReads_SingleEnd } from '../mo
 include { TrinityNormalizeReads as TrinityNormalizeReads_DoubleEnd } from '../modules/local/trinity_normalization.nf'
 //include { CreateSampleFile } from '../modules/local/Samples_file_for_trinity_normalization.nf'
 
+include { Staging as Staging_SingleEnd } from '../modules/local/create_samples_file_staging.nf'
+
+include { Staging as Staging_DoubleEnd } from '../modules/local/create_samples_file_staging.nf'
+
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -378,6 +382,11 @@ workflow RNASEQ {
         ch_sortmerna_multiqc = SORTMERNA.out.log
         ch_versions = ch_versions.mix(SORTMERNA.out.versions.first())
 }
+
+
+
+
+
     //  we do not need the header, but good to know the content.
     //    Channel
     // .value(['id', 'strandedness', 'read_1', 'read_2'].join('\t'))
@@ -429,15 +438,29 @@ workflow RNASEQ {
 //     .collectFile(name: 'samples_double_end.txt', newLine: true, sort: true)
 
 
+
+
 ch_samples_single_end = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == true
     }
 
+// ch_samples_single_end=Staging_SingleEnd(ch_filtered_reads_single_end)
+
+// ch_single_end_samples.out.single_end_samples.view{ txt ->
+//     "Staging Single Content: $txt"
+// }
+
 ch_samples_double_end = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
     }
+
+// ch_samples_double_end=Staging_DoubleEnd(ch_filtered_reads_double_end)
+
+// ch_doouble_end_samples.out.double_end_samples.view{ txt ->
+//     "Staging Double Content: $txt"}
+
 
 
 
@@ -453,49 +476,31 @@ ch_samples_double_end.view { txt ->
     "Sample Text Content: $txt"
 }
 
+// TrinityNormalizeReads_SingleEnd(ch_samples_single_end)
+// TrinityNormalizeReads_DoubleEnd(ch_samples_double_end)
+
+
+// ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd.out.normalized_files
+// ch_normalized_double_end_files = TrinityNormalizeReads_DoubleEnd.out.normalized_files
+
+
 TrinityNormalizeReads_SingleEnd(ch_samples_single_end)
 TrinityNormalizeReads_DoubleEnd(ch_samples_double_end)
+//ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd(ch_samples_single_end) is not best practice. 因为可能还有两个输出的情况，所以要用下面的方法
+
 ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd.out.normalized_files
 ch_normalized_double_end_files = TrinityNormalizeReads_DoubleEnd.out.normalized_files
-//ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd(ch_samples_single_end) is not best practice.
 
-
-TrinityNormalizeReads_SingleEnd.out.normalized_files.view { file ->
-    "Normalized Single End File Name: $file.name | Path: $file"
+TrinityNormalizeReads_SingleEnd.out.normalized_files.view { meta, file ->
+    "Normalized Single End File: Sample ID: ${meta.id}, File Name: $file.name | Path: $file"
 }
 
-TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { file ->
-    "Normalized Double End File Name: $file.name | Path: $file"
+TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { meta, file ->
+    "Normalized Double End File: Sample ID: ${meta.id}, File Name: $file.name | Path: $file"
 }
-
-
-
-// Mapping for single-end files
-ch_normalized_single_end_files_to_filtered = ch_normalized_single_end_files
-    .map { file ->
-        // Extract the file path
-        def path = [file]  // Note that there's only one file here
-
-        // Set meta data
-        def meta = ['id': 'FastQ_ReadyforStar_single', 'single_end': true, 'strandedness': 'auto']
-
-        return [meta, path]
-    }
-
-// Mapping for double-end files, similar to before
-ch_normalized_double_end_files_to_filtered = ch_normalized_double_end_files
-    .map { file ->
-        // Extract the file paths
-        def path = [file[0], file[1]]
-
-        // Set meta data
-        def meta = ['id': 'FastQ_ReadyforStar_double', 'single_end': false, 'strandedness': 'auto']
-
-        return [meta, path]
-    }
 
 // Using mix to combine the two channels to create ch_filtered_reads channel
-ch_filtered_reads = ch_normalized_single_end_files_to_filtered.mix(ch_normalized_double_end_files_to_filtered)
+ch_filtered_reads = ch_normalized_single_end_files.mix(ch_normalized_double_end_files)
 
 // Giving ch_filtered_reads an alias to adapt to the input pattern of STAR
 ch_filtered_reads_for_star = ch_filtered_reads
@@ -503,12 +508,52 @@ ch_filtered_reads_for_star = ch_filtered_reads
 // View the contents of ch_filtered_reads_for_star
 ch_filtered_reads_for_star.view()
 
+// TrinityNormalizeReads_SingleEnd.out.normalized_files.view { file ->
+//     "Normalized Single End File Name: $file.name | Path: $file"
+// }
+
+// TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { file ->
+//     "Normalized Double End File Name: $file.name | Path: $file"
+// }
+
+
+
+// // Mapping for single-end files
+// ch_normalized_single_end_files_to_filtered = ch_normalized_single_end_files
+//     .map { file ->
+//         // Extract the file path
+//         def path = [file]  // Note that there's only one file here
+
+//         // Set meta data
+//         def meta = ['id': 'FastQ_ReadyforStar_single', 'single_end': true, 'strandedness': 'auto']
+
+//         return [meta, path]
+//     }
+
+// // Mapping for double-end files, similar to before
+// ch_normalized_double_end_files_to_filtered = ch_normalized_double_end_files
+//     .map { file ->
+//         // Extract the file paths
+//         def path = [file[0], file[1]]
+
+//         // Set meta data
+//         def meta = ['id': 'FastQ_ReadyforStar_double', 'single_end': false, 'strandedness': 'auto']
+
+//         return [meta, path]
+//     }
 
 
 
 
 
+// // Using mix to combine the two channels to create ch_filtered_reads channel
+// ch_filtered_reads = ch_normalized_single_end_files_to_filtered.mix(ch_normalized_double_end_files_to_filtered)
 
+// // Giving ch_filtered_reads an alias to adapt to the input pattern of STAR
+// ch_filtered_reads_for_star = ch_filtered_reads
+
+// // View the contents of ch_filtered_reads_for_star
+// ch_filtered_reads_for_star.view()
 
 
 
