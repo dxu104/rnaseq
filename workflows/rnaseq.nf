@@ -373,7 +373,7 @@ workflow RNASEQ {
         )
         .reads
         .view{ "Meta: ${it[0]}, Path: ${it[1]}" }
-        .set { ch_filtered_reads }
+        .set { ch_filtered_reads }}
 
     //  we do not need the header, but good to know the content.
     //    Channel
@@ -430,7 +430,7 @@ TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { file ->
     "Normalized Double End File Name: $file.name | Path: $file"
 }
 
-}
+
 
 // Mapping for single-end files
 ch_normalized_single_end_files_to_filtered = ch_normalized_single_end_files
@@ -470,8 +470,7 @@ ch_filtered_reads_for_star.view()
 
 
 
-
-
+}
 
 
 //     //SUBWORKFLOW: Alignment with STAR and gene/transcript quantification with Salmon
@@ -992,7 +991,7 @@ ch_filtered_reads_for_star.view()
 //         )
 //         multiqc_report = MULTIQC.out.report.toList()
 //     }
- }
+ 
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
