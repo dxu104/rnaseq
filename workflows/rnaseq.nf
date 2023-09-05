@@ -102,13 +102,13 @@ include { MULTIQC                            } from '../modules/local/multiqc'
 include { MULTIQC_CUSTOM_BIOTYPE             } from '../modules/local/multiqc_custom_biotype'
 include { UMITOOLS_PREPAREFORRSEM as UMITOOLS_PREPAREFORSALMON } from '../modules/local/umitools_prepareforrsem.nf'
 //customized modules
-include { TrinityNormalizeReads as TrinityNormalizeReads_SingleEnd } from '../modules/local/trinity_normalization.nf'
-include { TrinityNormalizeReads as TrinityNormalizeReads_DoubleEnd } from '../modules/local/trinity_normalization.nf'
+include { TrinityNormalizeReads_SingleEnd } from '../modules/local/trinity_normalization_single.nf'
+include { TrinityNormalizeReads_DoubleEnd } from '../modules/local/trinity_normalization_double.nf'
 //include { CreateSampleFile } from '../modules/local/Samples_file_for_trinity_normalization.nf'
 
-include { Staging as Staging_SingleEnd } from '../modules/local/create_samples_file_staging.nf'
+// include { Staging as Staging_SingleEnd } from '../modules/local/create_samples_file_staging.nf'
 
-include { Staging as Staging_DoubleEnd } from '../modules/local/create_samples_file_staging.nf'
+// include { Staging as Staging_DoubleEnd } from '../modules/local/create_samples_file_staging.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -443,7 +443,10 @@ workflow RNASEQ {
 ch_samples_single_end = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == true
-    }
+    }.map{meta,path->
+    return path}
+
+    ch_samples_single_end =  ch_samples_single_end.buffer(1)
 
 // ch_samples_single_end=Staging_SingleEnd(ch_filtered_reads_single_end)
 
@@ -454,7 +457,9 @@ ch_samples_single_end = ch_filtered_reads
 ch_samples_double_end = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
-    }
+    }.map{meta,path->
+    return tuple(read1,read2)}
+     ch_samples_double_end =  ch_samples_double_end.buffer(2)
 
 // ch_samples_double_end=Staging_DoubleEnd(ch_filtered_reads_double_end)
 
