@@ -102,8 +102,8 @@ include { MULTIQC                            } from '../modules/local/multiqc'
 include { MULTIQC_CUSTOM_BIOTYPE             } from '../modules/local/multiqc_custom_biotype'
 include { UMITOOLS_PREPAREFORRSEM as UMITOOLS_PREPAREFORSALMON } from '../modules/local/umitools_prepareforrsem.nf'
 //customized modules
-include { TrinityNormalizeReads_SingleEnd } from '../modules/local/trinity_normalization_single.nf'
-include { TrinityNormalizeReads_DoubleEnd } from '../modules/local/trinity_normalization_double.nf'
+include { TrinityNormalizeReads as TrinityNormalizeReads_SingleEnd } from '../modules/local/trinity_normalization.nf'
+include { TrinityNormalizeReads as TrinityNormalizeReads_DoubleEnd } from '../modules/local/trinity_normalization.nf'
 //include { CreateSampleFile } from '../modules/local/Samples_file_for_trinity_normalization.nf'
 
 // include { Staging as Staging_SingleEnd } from '../modules/local/create_samples_file_staging.nf'
@@ -443,10 +443,23 @@ workflow RNASEQ {
 ch_samples_single_end = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == true
-    }.map{meta,path->
-    return path}
+    }
 
-    ch_samples_single_end =  ch_samples_single_end.buffer(1)
+ch_samples_single_end
+      .map {
+            meta, fastq ->
+                new_id = 'all_single'
+                [ meta + [id: new_id], fastq ]
+        }
+        .groupTuple()
+        .map {
+            meta, fastq ->
+                [ meta, fastq.flatten() ]
+        }
+    .set { ch_inputfor_single_TrinityNormalization }
+
+
+    //ch_samples_single_end =  ch_samples_single_end.buffer(1)
 
 // ch_samples_single_end=Staging_SingleEnd(ch_filtered_reads_single_end)
 
@@ -457,9 +470,21 @@ ch_samples_single_end = ch_filtered_reads
 ch_samples_double_end = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
-    }.map{meta,path->
-    return tuple(read1,read2)}
-     ch_samples_double_end =  ch_samples_double_end.buffer(2)
+    }
+
+ch_samples_double_end
+      .map {
+            meta, fastq ->
+                new_id = 'all_double'
+                [ meta + [id: new_id], fastq.flatten() ]
+        }
+        .groupTuple()
+        .map {
+            meta, fastq ->
+                [ meta, fastq.flatten() ]
+        }
+    .set { ch_inputfor_double_TrinityNormalization}
+   //  ch_samples_double_end =  ch_samples_double_end.buffer(2)
 
 // ch_samples_double_end=Staging_DoubleEnd(ch_filtered_reads_double_end)
 
@@ -472,37 +497,39 @@ ch_samples_double_end = ch_filtered_reads
     //delete storeDir option .,then samples.txt will be in the work directory like 3c/d2lj4l2j2l424
     //collectFile(name: 'samples.txt', newLine: true, storeDir:"${params.outdir}/sortmerna", sort:true)
 // for single end
-ch_samples_single_end.view { txt ->
-    "Sample Text Content: $txt"
+ch_inputfor_single_TrinityNormalization.view { txt ->
+    "Single End Sample Text Content: $txt"
 }
+//Output
+//Single End Sample Text Content: [[id:all, single_end:true, strandedness:reverse], [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/37/5d62886bd8a4d5bd9f253a68314d6b/RAP1_UNINDUCED_REP1_primary.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/74/ef82426b7ac641fdaf48f1a4b8bb2f/RAP1_UNINDUCED_REP2_primary.fastq.gz]]
+
 
 // for double end
-ch_samples_double_end.view { txt ->
-    "Sample Text Content: $txt"
+ch_inputfor_double_TrinityNormalization.view { txt ->
+    "Double End Sample Text Content: $txt"
 }
+//Output
+//Double End Sample Text Content: [[id:all, single_end:false, strandedness:reverse], [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/56/1390d8482d6e054da0495b8ca2aaa4/WT_REP2_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/56/1390d8482d6e054da0495b8ca2aaa4/WT_REP2_primary_2.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/18/0fe6ad3e9ec70616e41ef120163c20/RAP1_IAA_30M_REP1_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/18/0fe6ad3e9ec70616e41ef120163c20/RAP1_IAA_30M_REP1_primary_2.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/98/d1faae18131d045010bbf81d22eb35/WT_REP1_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/98/d1faae18131d045010bbf81d22eb35/WT_REP1_primary_2.fastq.gz]]
 
-// TrinityNormalizeReads_SingleEnd(ch_samples_single_end)
-// TrinityNormalizeReads_DoubleEnd(ch_samples_double_end)
-
-
-// ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd.out.normalized_files
-// ch_normalized_double_end_files = TrinityNormalizeReads_DoubleEnd.out.normalized_files
+TrinityNormalizeReads_SingleEnd(ch_inputfor_single_TrinityNormalization)
+TrinityNormalizeReads_DoubleEnd(ch_inputfor_double_TrinityNormalization)
 
 
-TrinityNormalizeReads_SingleEnd(ch_samples_single_end)
-TrinityNormalizeReads_DoubleEnd(ch_samples_double_end)
-//ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd(ch_samples_single_end) is not best practice. 因为可能还有两个输出的情况，所以要用下面的方法
+ ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd.out.normalized_files
+ ch_normalized_double_end_files = TrinityNormalizeReads_DoubleEnd.out.normalized_files
 
-ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd.out.normalized_files
-ch_normalized_double_end_files = TrinityNormalizeReads_DoubleEnd.out.normalized_files
 
 TrinityNormalizeReads_SingleEnd.out.normalized_files.view { meta, file ->
     "Normalized Single End File: Sample ID: ${meta.id}, File Name: $file.name | Path: $file"
 }
 
+
+
 TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { meta, file ->
     "Normalized Double End File: Sample ID: ${meta.id}, File Name: $file.name | Path: $file"
 }
+//Take look this!!
+//Normalized Double End File: Sample ID: all, File Name: [left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq] | Path: [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/e7/25404dede3fc0aa04868df4abc13f7/results_trinity/insilico_read_normalization_altogether/left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/e7/25404dede3fc0aa04868df4abc13f7/results_trinity/insilico_read_normalization_altogether/right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq]
 
 // Using mix to combine the two channels to create ch_filtered_reads channel
 ch_filtered_reads = ch_normalized_single_end_files.mix(ch_normalized_double_end_files)
@@ -511,15 +538,16 @@ ch_filtered_reads = ch_normalized_single_end_files.mix(ch_normalized_double_end_
 ch_filtered_reads_for_star = ch_filtered_reads
 
 // View the contents of ch_filtered_reads_for_star
-ch_filtered_reads_for_star.view()
+ch_filtered_reads_for_star.view { meta, file ->
+    "Filtered Reads for STAR: Sample ID: ${meta.id}, Single_end: ${meta.single_end}, Standedness:  ${meta.strandedness}. File Name: $file.name | Path: $file"}
 
-// TrinityNormalizeReads_SingleEnd.out.normalized_files.view { file ->
-//     "Normalized Single End File Name: $file.name | Path: $file"
-// }
+//Filtered Reads for STAR: Sample ID: all, Single_end: true, Standedness:  reverse. File Name: single.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq | Path: /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/a4/cd7d209b3906a76e5fea0b2387b77e/results_trinity/insilico_read_normalization_altogether/single.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq
+//Filtered Reads for STAR: Sample ID: all, Single_end: false, Standedness:  reverse. File Name: [left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq] | Path: [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/0d/30707dbf1d9d65bbc1eb4c76c3af87/results_trinity/insilico_read_normalization_altogether/left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/0d/30707dbf1d9d65bbc1eb4c76c3af87/results_trinity/insilico_read_normalization_altogether/right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq]
 
-// TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { file ->
-//     "Normalized Double End File Name: $file.name | Path: $file"
-// }
+
+
+
+
 
 
 
@@ -549,20 +577,7 @@ ch_filtered_reads_for_star.view()
 
 
 
-
-
-// // Using mix to combine the two channels to create ch_filtered_reads channel
-// ch_filtered_reads = ch_normalized_single_end_files_to_filtered.mix(ch_normalized_double_end_files_to_filtered)
-
-// // Giving ch_filtered_reads an alias to adapt to the input pattern of STAR
-// ch_filtered_reads_for_star = ch_filtered_reads
-
-// // View the contents of ch_filtered_reads_for_star
-// ch_filtered_reads_for_star.view()
-
-
-
-    //SUBWORKFLOW: Alignment with STAR and gene/transcript quantification with Salmon
+   // SUBWORKFLOW: Alignment with STAR and gene/transcript quantification with Salmon
 
     ch_genome_bam                 = Channel.empty()
     ch_genome_bam_index           = Channel.empty()
@@ -628,6 +643,8 @@ ch_filtered_reads_for_star.view()
                 ch_transcriptome_sorted_bam.join(ch_transcriptome_sorted_bai, by: [0]),
                 params.umitools_dedup_stats
             )
+
+
 
             // Name sort BAM before passing to Salmon
             SAMTOOLS_SORT (
