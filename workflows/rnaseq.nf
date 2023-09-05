@@ -1115,3 +1115,4 @@ workflow.onComplete {
 // top  ctrl+S to lock the screen
 //kill -9  1234
 //workDir = 's3://mdibl-nextflow-work/dxu/ZebraFishTestWorkDir/'
+//nextflow run /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq -profile test_full_aws,docker  --outdir s3://mdibl-dxu/Zebrafish_Test_fourfile/

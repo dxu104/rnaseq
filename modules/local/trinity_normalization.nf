@@ -4,6 +4,7 @@
 //nextflow run /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq -profile test,docker --outdir /Users/dxu/MDI  -c /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/conf/base.config -resume
 
 process TrinityNormalizeReads {
+
     conda "bioconda::trinity=2.13.2"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/trinity:2.13.2--h00214ad_1':
@@ -16,40 +17,65 @@ process TrinityNormalizeReads {
     tuple val(meta), path("results_trinity/insilico_read_normalization_altogether/*.norm.*.fq"), emit: normalized_files
 
     script:
-    def read1_files, read2_files
-    if (meta.single_end == true) {
-        read1_files = reads.collect { it.toString() }.join(",")
-        read2_files = null
-    } else {
-        read1_files = reads[0].collect { it.toString() }.join(",")
-        read2_files = reads[1].collect { it.toString() }.join(",")
-    }
+
 
     """
-    if [ "${meta.single_end}" == "true" ]
-    then
-        Trinity \\
-            --seqType fq \\
-            --single $read1_files \\
-            --max_memory 512G --CPU 64 \\
-            --output results_trinity \\
-            --normalize_by_read_set \\
-            --just_normalize_reads
-    else
-        echo "Read2 Files: $read2_files"
-        Trinity \\
-            --seqType fq \\
-            --left $read1_files \\
-            --right $read2_files \\
-            --max_memory 512G --CPU 32 \\
-            --output results_trinity \\
-            --normalize_by_read_set \\
-            --just_normalize_reads
-    fi
+    # Create an array of file paths
+    files=(*.fastq.gz)
+
+    # Create the TSV file
+    echo -e "Replicate\tAbsolute Path\tFilename" > samplesheet.tsv
+
+    # Loop through the files and append their absolute path and filename to the TSV file
+    for file in "${files[@]}"; do
+        absolute_path=$(realpath "$file")
+        filename=$(basename "$file")
+        replicate=$(echo $filename | cut -f 2 -d "_" | cut -f 1 -d ".")
+        echo -e "$replicate\t$absolute_path\t$filename" >> samplesheet.tsv
+    done
+
+    Trinity \\
+        --seqType fq \\
+        --samples_file samplesheet.tsv \\
+        --max_memory 512G --CPU 64 \\
+        --output results_trinity \\
+        --normalize_by_read_set \\
+        --just_normalize_reads
     """
+
 }
 
+// def read1_files, read2_files
+    // if (meta.single_end == true) {
+    //     read1_files = reads.collect { it.toString() }.join(",")
+    //     read2_files = null
+    // } else {
+    //     read1_files = reads[0].collect { it.toString() }.join(",")
+    //     read2_files = reads[1].collect { it.toString() }.join(",")
+    // }
 
+// """
+    // if [ "${meta.single_end}" == "true" ]
+    // then
+    //     Trinity \\
+    //         --seqType fq \\
+    //         --single $read1_files \\
+    //         --max_memory 512G --CPU 32 \\
+    //         --output results_trinity \\
+    //         --normalize_by_read_set \\
+    //         --just_normalize_reads
+    // else
+    //     echo "Read2 Files: $read2_files"
+    //     Trinity \\
+    //         --seqType fq \\
+    //         --left $read1_files \\
+    //         --right $read2_files \\
+    //         --max_memory 512G --CPU 32 \\
+    //         --output results_trinity \\
+    //         --normalize_by_read_set \\
+    //         --just_normalize_reads
+    // fi
+    // """
 
 // 下面这个生效了，但是生成了7个left,7个right。
 // process TrinityNormalizeReads {
@@ -129,10 +155,10 @@ process TrinityNormalizeReads {
 
 
 
-    // input:
-    //  path samples_file
+//     input:
+//      path samples_file
 
-    // Outputs
+//     Outputs
 //    output:
 //    path("results_trinity/insilico_read_normalization_altogether/single.norm.*.fq"), emit: single_normalized_files
 //    path("results_trinity/insilico_read_normalization_altogether/{left,right}.norm.*.fq"), emit: double_normalized_files
@@ -145,8 +171,8 @@ process TrinityNormalizeReads {
 
 //     input:
 //     path samples_file
-    // output:
-    // path("results_trinity/insilico_read_normalization_altogether/*.norm.*.fq"), emit: normalized_files
+//     output:
+//     path("results_trinity/insilico_read_normalization_altogether/*.norm.*.fq"), emit: normalized_files
 
 //     script:
 //     """
