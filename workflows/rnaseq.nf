@@ -440,23 +440,6 @@ workflow RNASEQ {
 
 
 
-ch_samples_single_end = ch_filtered_reads
-    .filter { meta, path ->
-        meta.single_end == true
-    }
-
-ch_samples_single_end
-      .map {
-            meta, fastq ->
-                new_id = 'all_single'
-                [ meta + [id: new_id], fastq ]
-        }
-        .groupTuple()
-        .map {
-            meta, fastq ->
-                [ meta, fastq.flatten() ]
-        }
-    .set { ch_inputfor_single_TrinityNormalization }
 
 
     //ch_samples_single_end =  ch_samples_single_end.buffer(1)
@@ -486,20 +469,14 @@ ch_samples_double_end
     .set { ch_inputfor_double_TrinityNormalization}
    //  ch_samples_double_end =  ch_samples_double_end.buffer(2)
 
-// ch_samples_double_end=Staging_DoubleEnd(ch_filtered_reads_double_end)
 
-// ch_doouble_end_samples.out.double_end_samples.view{ txt ->
-//     "Staging Double Content: $txt"}
 
 
 
 
     //delete storeDir option .,then samples.txt will be in the work directory like 3c/d2lj4l2j2l424
     //collectFile(name: 'samples.txt', newLine: true, storeDir:"${params.outdir}/sortmerna", sort:true)
-// for single end
-ch_inputfor_single_TrinityNormalization.view { txt ->
-    "Single End Sample Text Content: $txt"
-}
+
 //Output
 //Single End Sample Text Content: [[id:all, single_end:true, strandedness:reverse], [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/37/5d62886bd8a4d5bd9f253a68314d6b/RAP1_UNINDUCED_REP1_primary.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/74/ef82426b7ac641fdaf48f1a4b8bb2f/RAP1_UNINDUCED_REP2_primary.fastq.gz]]
 
@@ -511,18 +488,10 @@ ch_inputfor_double_TrinityNormalization.view { txt ->
 //Output
 //Double End Sample Text Content: [[id:all, single_end:false, strandedness:reverse], [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/56/1390d8482d6e054da0495b8ca2aaa4/WT_REP2_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/56/1390d8482d6e054da0495b8ca2aaa4/WT_REP2_primary_2.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/18/0fe6ad3e9ec70616e41ef120163c20/RAP1_IAA_30M_REP1_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/18/0fe6ad3e9ec70616e41ef120163c20/RAP1_IAA_30M_REP1_primary_2.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/98/d1faae18131d045010bbf81d22eb35/WT_REP1_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/98/d1faae18131d045010bbf81d22eb35/WT_REP1_primary_2.fastq.gz]]
 
-TrinityNormalizeReads_SingleEnd(ch_inputfor_single_TrinityNormalization)
 TrinityNormalizeReads_DoubleEnd(ch_inputfor_double_TrinityNormalization)
 
 
- ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd.out.normalized_files
  ch_normalized_double_end_files = TrinityNormalizeReads_DoubleEnd.out.normalized_files
-
-
-TrinityNormalizeReads_SingleEnd.out.normalized_files.view { meta, file ->
-    "Normalized Single End File: Sample ID: ${meta.id}, File Name: $file.name | Path: $file"
-}
-
 
 
 TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { meta, file ->
@@ -531,8 +500,45 @@ TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { meta, file ->
 //Take look this!!
 //Normalized Double End File: Sample ID: all, File Name: [left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq] | Path: [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/e7/25404dede3fc0aa04868df4abc13f7/results_trinity/insilico_read_normalization_altogether/left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/e7/25404dede3fc0aa04868df4abc13f7/results_trinity/insilico_read_normalization_altogether/right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq]
 
+
+//In terms of Single end
+Channel.empty().set { ch_normalized_single_end_files }
+
+if (params.single_end_sample) {
+    ch_samples_single_end = ch_filtered_reads
+        .filter { meta, path ->
+            meta.single_end == true
+        }
+
+    ch_samples_single_end
+          .map {
+                meta, fastq ->
+                    new_id = 'all_single'
+                    [ meta + [id: new_id], fastq ]
+            }
+            .groupTuple()
+            .map {
+                meta, fastq ->
+                    [ meta, fastq.flatten() ]
+            }
+        .set { ch_inputfor_single_TrinityNormalization }
+
+    // for single end
+    ch_inputfor_single_TrinityNormalization.view { txt ->
+        "Single End Sample Text Content: $txt"
+    }
+
+    TrinityNormalizeReads_SingleEnd(ch_inputfor_single_TrinityNormalization)
+
+    ch_normalized_single_end_files = TrinityNormalizeReads_SingleEnd.out.normalized_files
+    TrinityNormalizeReads_SingleEnd.out.normalized_files.view { meta, file ->
+        "Normalized Single End File: Sample ID: ${meta.id}, File Name: $file.name | Path: $file"
+    }
+}
+
+
 // Using mix to combine the two channels to create ch_filtered_reads channel
-ch_filtered_reads = ch_normalized_single_end_files.mix(ch_normalized_double_end_files)
+ch_filtered_reads = ch_normalized_double_end_files.mix(ch_normalized_single_end_files)
 
 // Giving ch_filtered_reads an alias to adapt to the input pattern of STAR
 ch_filtered_reads_for_star = ch_filtered_reads
@@ -610,6 +616,9 @@ ch_filtered_reads_for_star.view { meta, file ->
             ch_genome_bam_index = ALIGN_STAR.out.csi
         }
         ch_versions = ch_versions.mix(ALIGN_STAR.out.versions)
+
+
+
 
 
        // SUBWORKFLOW: Remove duplicate reads from BAM file based on UMIs
@@ -1136,5 +1145,16 @@ workflow.onComplete {
 //ps aux |grep nextflow
 // top  ctrl+S to lock the screen
 //kill -9  1234
-//workDir = 's3://mdibl-nextflow-work/dxu/ZebraFishTestWorkDir/'
-//nextflow run /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq -profile test_full_aws,docker  --outdir s3://mdibl-dxu/Zebrafish_Test_fourfile/
+
+
+//test tuplegroup  passing Trinity  but notmatch
+//test tuplegroup command: nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_samplefile/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_grouptuple/
+
+//test Zebrafish passing Trinity Normalization  but notmatch 
+// test Zebrafish  command: nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_full/  
+
+//testfull 8Gb*16 
+//testfull comand nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_100G/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_full_100G/ -resume
+
+//4 testfull 36GB 
+//command nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_36GB_4files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_4files_36G/ -resume  

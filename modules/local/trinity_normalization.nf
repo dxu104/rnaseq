@@ -1,4 +1,6 @@
 process TrinityNormalizeReads {
+     tag "$meta.id"
+    label 'process_high'
 
     conda "bioconda::trinity=2.13.2"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -16,54 +18,116 @@ process TrinityNormalizeReads {
 
 
     script:
-    '''
-# Ensure the samplesheet.tsv file is empty or create it
-> samplesheet.tsv
+        '''
+    # Ensure the samplesheet.tsv file is empty or create it
+    > samplesheet.tsv
 
-# Loop through all fastq.gz files
-for file in *.fastq.gz; do
-    # Skip if file is an R2 or _2 file
-    if [[ $file =~ "_R2.fastq.gz" || $file =~ "_2.fastq.gz" ]]; then
-        continue
-    fi
+    # Loop through all fastq.gz and fq.gz files
+    for file in *.{fastq,fq}.gz; do
+        # Check if the file actually exists
+        if [[ ! -e $file ]]; then
+            continue
+        fi
 
-    paired_file=""
-    # Determine if the file is R1, _1, or single-end and set paired_file accordingly
-    if [[ $file =~ "_R1.fastq.gz" ]]; then
-        id=$(echo $file | cut -f 1 -d "_")
-        paired_file="${id}_R2.fastq.gz"
-    elif [[ $file =~ "_1.fastq.gz" ]]; then
-        id=$(echo $file | rev | cut -d "_" -f 2- | rev)
-        paired_file="${id}_2.fastq.gz"
-    else
-        id=$(echo $file | rev | cut -d "." -f 2- | rev)
-    fi
+        echo "Processing file: $file"
 
-    # Get absolute path for the file
-    abs_file=$(realpath "$file")
-
-    # If it's a paired-end read, check if paired_file exists and get its absolute path
-    if [[ -n $paired_file && -e $paired_file ]]; then
-        abs_paired=$(realpath "$paired_file")
-        echo -e "$id\t$id\t$abs_file\t$abs_paired" >> samplesheet.tsv
-    elif [[ -z $paired_file ]]; then
-        # For single-end reads, only output the single file path
-        echo -e "$id\t$id\t$abs_file" >> samplesheet.tsv
-    fi
-done
+            # Skip if file is an R2 or _2 file
+        if [[ $file =~ "_R2.fastq.gz"  || $file =~ "_R2.fq.gz" || $file =~ "_2_val_2.fastq.gz" || $file =~ "_2_val_2.fq.gz" || $file =~ "_2.fastq.gz" || $file =~ "_2.fq.gz" ]]; then
+            continue
+        fi
 
 
+        paired_file=""
+        # Determine if the file is R1, _1_val_1, or single-end and set paired_file accordingly
+        if [[ $file =~ "_R1.fastq.gz" || $file =~ "_R1.fq.gz" ]]; then
+             id=$(echo $file | sed 's/_R1.*//')
+            paired_file="${id}_R2.${file#*.}"
+        elif [[ $file =~ "_1_val_1.fastq.gz" || $file =~ "_1_val_1.fq.gz" ]]; then
+            id=$(echo $file | sed 's/_1_val_1.*//')
+            paired_file="${id}_2_val_2.${file#*.}"
+        elif [[ $file =~ "_1.fastq.gz" || $file =~ "_1.fq.gz" ]]; then
+            id=$(echo $file | sed 's/_1.*//')
+            paired_file="${id}_2.${file#*.}"      
+        else
+            id=$(basename "$file" | rev | cut -d "." -f 3- | rev)
+        fi
+
+        # Get absolute path for the file
+        abs_file=$(realpath "$file")
+
+        # If it's a paired-end read, check if paired_file exists and get its absolute path
+        if [[ -n $paired_file && -e $paired_file ]]; then
+            abs_paired=$(realpath "$paired_file")
+            echo -e "$id\t$id\t$abs_file\t$abs_paired" >> samplesheet.tsv
+        elif [[ -z $paired_file ]]; then
+            # For single-end reads, only output the single file path
+            echo -e "$id\t$id\t$abs_file" >> samplesheet.tsv
+        fi
+    done
+
+
+        
 
 Trinity \\
     --seqType fq \\
     --samples_file samplesheet.tsv \\
-    --max_memory 512G --CPU 64 \\
+    --max_memory 1024G --CPU 256 \\
     --output results_trinity \\
     --normalize_by_read_set \\
     --just_normalize_reads
 '''
 }
+//In terms of "id=$(echo $file ... part", We will get anything before the following String pattern
+//_1_val_1.fastq.gz
+//_2_val_2.fastq.gz
+//_R1.fastq.gz
+//_R2.fastq.gz
+//_1.fastq.gz
+//_2.fastq.gz
 
+
+// # Ensure the samplesheet.tsv file is empty or create it
+//     > samplesheet.tsv
+
+
+//     # Loop through all fastq.gz files
+//     for file in *.fastq.gz; do
+//         # Skip if file is an R2 or _2 file
+//         if [[ $file =~ "_R2.fastq.gz" || $file =~ "_2.fastq.gz" ]]; then
+//             continue
+//         fi
+
+//         paired_file=""
+//         # Determine if the file is R1, _1, or single-end and set paired_file accordingly
+//         if [[ $file =~ "_R1.fastq.gz" ]]; then
+//             id=$(echo $file | cut -f 1 -d "_")
+//             paired_file="${id}_R2.fastq.gz"
+//         elif [[ $file =~ "_1.fastq.gz" ]]; then
+//             id=$(echo $file | rev | cut -d "_" -f 2- | rev)
+//             paired_file="${id}_2.fastq.gz"
+//         else
+//             id=$(echo $file | rev | cut -d "." -f 2- | rev)
+//         fi
+
+//         # Get absolute path for the file
+//         abs_file=$(realpath "$file")
+
+//         # If it's a paired-end read, check if paired_file exists and get its absolute path
+//         if [[ -n $paired_file && -e $paired_file ]]; then
+//             abs_paired=$(realpath "$paired_file")
+//             echo -e "$id\t$id\t$abs_file\t$abs_paired" >> samplesheet.tsv
+//         elif [[ -z $paired_file ]]; then
+//             # For single-end reads, only output the single file path
+//             echo -e "$id\t$id\t$abs_file" >> samplesheet.tsv
+//         fi
+//     done
+
+
+ //Check if any .fastq.gz files exist
+    // if [[ $(ls *.fastq.gz 2> /dev/null | wc -l) -eq 0 ]]; then
+    //     echo "No .fastq.gz files found in the directory."
+    //     exit 0
+    // fi
 // output for single sample sheet nd all the single end files' symlinks and samplesheet.tsv localed in the same folder.
 // RAP1_UNINDUCED_REP1_primary.fastq	RAP1_UNINDUCED_REP1_primary.fastq	/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/37/5d62886bd8a4d5bd9f253a68314d6b/RAP1_UNINDUCED_REP1_primary.fastq.gz
 // RAP1_UNINDUCED_REP2_primary.fastq	RAP1_UNINDUCED_REP2_primary.fastq	/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/74/ef82426b7ac641fdaf48f1a4b8bb2f/RAP1_UNINDUCED_REP2_primary.fastq.gz
