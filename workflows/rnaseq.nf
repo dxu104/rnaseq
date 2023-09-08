@@ -102,10 +102,9 @@ include { MULTIQC                            } from '../modules/local/multiqc'
 include { MULTIQC_CUSTOM_BIOTYPE             } from '../modules/local/multiqc_custom_biotype'
 include { UMITOOLS_PREPAREFORRSEM as UMITOOLS_PREPAREFORSALMON } from '../modules/local/umitools_prepareforrsem.nf'
 //customized modules
-include { TrinityNormalizeReads as TrinityNormalizeReads_SingleEnd } from '../modules/local/trinity_normalization.nf'
-include { TrinityNormalizeReads as TrinityNormalizeReads_DoubleEnd } from '../modules/local/trinity_normalization.nf'
+include { TrinityNormalizeReads as TrinityNormalizeReads_SingleEnd } from '../modules/local/TrinityNormalization/trinity_normalization.nf'
+include { TrinityNormalizeReads as TrinityNormalizeReads_DoubleEnd } from '../modules/local/TrinityNormalization/trinity_normalization.nf'
 //include { CreateSampleFile } from '../modules/local/Samples_file_for_trinity_normalization.nf'
-
 // include { Staging as Staging_SingleEnd } from '../modules/local/create_samples_file_staging.nf'
 
 // include { Staging as Staging_DoubleEnd } from '../modules/local/create_samples_file_staging.nf'
@@ -534,6 +533,7 @@ if (params.single_end_sample) {
     TrinityNormalizeReads_SingleEnd.out.normalized_files.view { meta, file ->
         "Normalized Single End File: Sample ID: ${meta.id}, File Name: $file.name | Path: $file"
     }
+    ch_versions = ch_versions.mix(TrinityNormalizeReads_SingleEnd.out.versions)
 }
 
 
@@ -549,7 +549,7 @@ ch_filtered_reads_for_star.view { meta, file ->
 
 //Filtered Reads for STAR: Sample ID: all, Single_end: true, Standedness:  reverse. File Name: single.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq | Path: /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/a4/cd7d209b3906a76e5fea0b2387b77e/results_trinity/insilico_read_normalization_altogether/single.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq
 //Filtered Reads for STAR: Sample ID: all, Single_end: false, Standedness:  reverse. File Name: [left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq] | Path: [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/0d/30707dbf1d9d65bbc1eb4c76c3af87/results_trinity/insilico_read_normalization_altogether/left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/0d/30707dbf1d9d65bbc1eb4c76c3af87/results_trinity/insilico_read_normalization_altogether/right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq]
-
+ch_versions = ch_versions.mix(TrinityNormalizeReads_DoubleEnd.out.versions)
 
 
 
@@ -1151,10 +1151,11 @@ workflow.onComplete {
 //test tuplegroup command: nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_samplefile/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_grouptuple/
 
 //test Zebrafish passing Trinity Normalization  but notmatch 
-// test Zebrafish  command: nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_full/  
+// test Zebrafish  command: nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_full/ -resume
 
 //testfull 8Gb*16 
 //testfull comand nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_100G/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_full_100G/ -resume
 
 //4 testfull 36GB 
-//command nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_36GB_4files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_4files_36G/ -resume  
+//command nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_36GB_4files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_4files_36G/ -resume 
+//nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile Zebrafish_test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/ZeBraFish/ -work-dir s3://mdibl-nextflow-work/dxu/ZebraFish_Lastet/ -resume 
