@@ -32,8 +32,7 @@ process TrinityNormalizeReads {
         avail_mem = (task.memory.giga*0.8).intValue()
     }
 
-//avail_mem=\$(echo '$avail_mem_groovy')
-// prefix=\$(echo '$prefix_groovy')
+
     '''
     # Ensure the samplesheet.tsv file is empty or create it
     > samplesheet.tsv

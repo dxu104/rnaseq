@@ -13,7 +13,7 @@ process TrinityNormalizeReads {
 
 
     output:
-    tuple val(meta), path("results_trinity/insilico_read_normalization_altogether/*.norm.*.fq"), emit: normalized_files
+    tuple val(meta), path("*_trinity/insilico_read_normalization_altogether/*.norm.*.fq.gz"), emit: normalized_files
     path "versions.yml"  , emit: versions
 
 
@@ -91,19 +91,32 @@ process TrinityNormalizeReads {
         --CPU $task.cpus \\
         --normalize_by_read_set \\
         --just_normalize_reads
+        
+      
 
-     cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        trinity: \$(echo \$(Trinity --version | head -n 1 2>&1) | sed 's/^Trinity version: Trinity-v//' ))
-    END_VERSIONS    
+#Use fuzzy matching to find all files matching the *.norm.*.fq pattern.
+#For each matched file, compress its contents using gzip -c and save the compressed contents to a new file with the original filename with the .gz suffix appended via Redirect >.
+#The original file remains unchanged.
+# Check for files with the desired pattern and gzip them
+# Check for files with the desired pattern in current directory and subdirectories, then gzip them
+found_files=\$(find . -type f -name "*.fq")
+if [[ -n "\$found_files" ]]; then
+    find . -type f -name "*.fq" | while read -r file; do
+        echo "Processing file: \$file" 
+        gzip -cf "\$file" > "\${file}.gz"
+        echo "Compressed to: \${file}.gz"
+    done
+else
+    echo "No files matching the pattern were found."
+fi
 
-     #Use fuzzy matching to find all files matching the *.norm.*.fq pattern.
-     #For each matched file, compress its contents using gzip -c and save the compressed contents to a new file with the original filename with the .gz suffix appended via Redirect >.
-    #The original file remains unchanged.
-    for file in *.norm.*.fq; do
-    gzip -cf "\$file" > "\${file}.gz"
-done  
+  
+cat <<-END_VERSIONS > versions.yml
+"${task.process}":
+    trinity: \$(echo \$(Trinity --version | head -n 1 2>&1) | sed 's/^Trinity version: Trinity-v//' ))
+END_VERSIONS
 """
+
 }
 
 //In terms of "id=$(echo $file ... part", We will get anything before the following String pattern
