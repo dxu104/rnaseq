@@ -1138,7 +1138,7 @@ workflow.onComplete {
 //git fetch origin
 // git merge origin/master or git merge origin/developbrach
 // sudo nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test_full,docker --outdir /compbio/scratch/dxu/newrnaseq/ -stub-run
-// nohup sudo nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test_full,docker --outdir /compbio/scratch/dxu/newrnaseq/ -stub-run &> nextflow.out&
+// nohup nextflow run-profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_18GB_2files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_2files_18G/ &> nextflow.out&
 
 //cat nextflow.out
 ////tail nextflow.out
@@ -1147,15 +1147,15 @@ workflow.onComplete {
 //kill -9  1234
 
 
-//test tuplegroup  passing Trinity  but notmatch
+//test tuplegroup  passing Trinity and salmon  Failed to sanitize XML document destined for handler class com.amazonaws.services.s3.model.transform.XmlResponsesSaxParser$ListBucketHandler
 //test tuplegroup command: nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_samplefile/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_grouptuple/
 
-//test Zebrafish passing Trinity Normalization  but notmatch 
-// test Zebrafish  command: nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_full/ -resume
+//test Zebrafish  passing Trinity and salmon  Failed to sanitize XML document destined for handler class com.amazonaws.services.s3.model.transform.XmlResponsesSaxParser$ListBucketHandler
+
+// test Zebrafish  command: nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile docker -c Zebrafish_test.config -c  nextflow.AWSBatch.config --outdir s3://mdibl-dxu/ZeBraFish/ -work-dir s3://mdibl-nextflow-work/dxu/ZebraFish_Lastet/ -resume
 
 //testfull 8Gb*16 
 //testfull comand nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_100G/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_full_100G/ -resume
 
 //4 testfull 36GB 
 //command nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_36GB_4files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_4files_36G/ -resume 
-//nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile Zebrafish_test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/ZeBraFish/ -work-dir s3://mdibl-nextflow-work/dxu/ZebraFish_Lastet/ -resume 
