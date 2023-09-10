@@ -1138,7 +1138,7 @@ workflow.onComplete {
 //git fetch origin
 // git merge origin/master or git merge origin/developbrach
 // sudo nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test_full,docker --outdir /compbio/scratch/dxu/newrnaseq/ -stub-run
-// nohup nextflow run-profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_18GB_2files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_2files_18G/ &> nextflow.out&
+// nohup nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_18GB_2files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_2files_18G/ &> nextflow.out&
 
 //cat nextflow.out
 ////tail nextflow.out
@@ -1159,3 +1159,9 @@ workflow.onComplete {
 
 //4 testfull 36GB 
 //command nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_36GB_4files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_4files_36G/ -resume 
+
+//2 testfull 18gb
+//command nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_18GB_2files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_2files_18G/
+
+//test pass all ready to StringTie merge
+// nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_samplefile/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_grouptuple/
