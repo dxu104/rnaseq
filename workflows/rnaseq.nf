@@ -279,7 +279,7 @@ workflow RNASEQ {
 
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters with TrimGalore!
-    //
+    // default setting trimmer is params.trimmer = 'trimgalore' in the nextflow.config
     ch_filtered_reads      = Channel.empty()
     ch_fastqc_raw_multiqc  = Channel.empty()
     ch_fastqc_trim_multiqc = Channel.empty()

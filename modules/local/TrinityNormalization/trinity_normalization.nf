@@ -49,7 +49,7 @@ process TrinityNormalizeReads {
         echo "Processing file: \$file"
 
         # Skip if file is an R2 or _2 file
-        if [[ \$file =~ "_R2.fastq.gz"  || \$file =~ "_R2.fq.gz" || \$file =~ "_2_val_2.fastq.gz" || \$file =~ "_2_val_2.fq.gz" || \$file =~ "_2.fastq.gz" || \$file =~ "_2.fq.gz" ]]; then
+        if [[ \$file =~ "_R2.fastq.gz"  || \$file =~ "_R2.fq.gz" || \$file =~ "_2_val_2.fastq.gz" || \$file =~ "_2_val_2.fq.gz" || \$file =~ "_2.fastq.gz" || \$file =~ "_2.fq.gz" || \$file =~ "_2.fastp.fq.gz" || \$file =~ "_2.fastp.fastq.gz" ]]; then
             continue
         fi
 
@@ -63,7 +63,10 @@ process TrinityNormalizeReads {
             paired_file="\${id}_2_val_2.\${file#*.}"
         elif [[ \$file =~ "_1.fastq.gz" || \$file =~ "_1.fq.gz" ]]; then
             id=\$(echo \$file | sed 's/_1.*//')
-            paired_file="\${id}_2.\${file#*.}"      
+            paired_file="\${id}_2.\${file#*.}"  
+        elif [[ \$file =~ "_1.fastp.fastq.gz" || \$file =~ "_1.fastp.fq.gz" ]]; then
+            id=\$(echo \$file | sed 's/_1.*//')
+            paired_file="\${id}_2.\${file#*.}"          
         else
             id=\$(basename "\$file" | rev | cut -d "." -f 3- | rev)
         fi
