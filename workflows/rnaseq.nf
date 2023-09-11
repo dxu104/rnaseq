@@ -448,7 +448,9 @@ workflow RNASEQ {
 // ch_single_end_samples.out.single_end_samples.view{ txt ->
 //     "Staging Single Content: $txt"
 // }
+Channel.empty().set { ch_normalized_double_end_files }
 
+if (params.double_end_sample) {
 ch_samples_double_end = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
@@ -495,6 +497,8 @@ TrinityNormalizeReads_DoubleEnd(ch_inputfor_double_TrinityNormalization)
 
 TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { meta, file ->
     "Normalized Double End File: Sample ID: ${meta.id}, File Name: $file.name | Path: $file"
+}
+
 }
 //Take look this!!
 //Normalized Double End File: Sample ID: all, File Name: [left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq] | Path: [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/e7/25404dede3fc0aa04868df4abc13f7/results_trinity/insilico_read_normalization_altogether/left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/e7/25404dede3fc0aa04868df4abc13f7/results_trinity/insilico_read_normalization_altogether/right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq]
@@ -549,7 +553,12 @@ ch_filtered_reads_for_star.view { meta, file ->
 
 //Filtered Reads for STAR: Sample ID: all, Single_end: true, Standedness:  reverse. File Name: single.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq | Path: /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/a4/cd7d209b3906a76e5fea0b2387b77e/results_trinity/insilico_read_normalization_altogether/single.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq
 //Filtered Reads for STAR: Sample ID: all, Single_end: false, Standedness:  reverse. File Name: [left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq] | Path: [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/0d/30707dbf1d9d65bbc1eb4c76c3af87/results_trinity/insilico_read_normalization_altogether/left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/0d/30707dbf1d9d65bbc1eb4c76c3af87/results_trinity/insilico_read_normalization_altogether/right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq]
+if (params.double_end_sample) {
 ch_versions = ch_versions.mix(TrinityNormalizeReads_DoubleEnd.out.versions)
+}
+if (params.single_end_sample) {
+ch_versions = ch_versions.mix(TrinityNormalizeReads_SingleEnd.out.versions)
+}
 
 
 
@@ -1163,5 +1172,11 @@ workflow.onComplete {
 //2 testfull 18gb
 //command nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_18GB_2files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_2files_18G/
 
-//test pass all ready to StringTie merge
-// nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_samplefile/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_grouptuple/
+//test input are only double, pass
+// nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_samplefile/ -work-dir s3://mdibl-nextflow-work/dxu/test_grouptuple/  -resume
+
+//test input are mix single and double input and pass all
+//nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_single_double/ -work-dir s3://mdibl-nextflow-work/dxu/test_single_double/ -resume
+
+//test are only single end input
+//nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_only_single/ -work-dir s3://mdibl-nextflow-work/dxu/test_only__single/ -resume 
