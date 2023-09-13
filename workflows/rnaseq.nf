@@ -106,8 +106,12 @@ include { TrinityNormalizeReads as TrinityNormalizeReads_SingleEnd } from '../mo
 include { TrinityNormalizeReads as TrinityNormalizeReads_DoubleEnd } from '../modules/local/TrinityNormalization/trinity_normalization.nf'
 //include { CreateSampleFile } from '../modules/local/Samples_file_for_trinity_normalization.nf'
 // include { Staging as Staging_SingleEnd } from '../modules/local/create_samples_file_staging.nf'
-
 // include { Staging as Staging_DoubleEnd } from '../modules/local/create_samples_file_staging.nf'
+
+//fastq after trinity normalization
+include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
+
+
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -143,6 +147,7 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoft
 //
 include { FASTQ_SUBSAMPLE_FQ_SALMON        } from '../subworkflows/nf-core/fastq_subsample_fq_salmon/main'
 include { FASTQ_FASTQC_UMITOOLS_TRIMGALORE } from '../subworkflows/nf-core/fastq_fastqc_umitools_trimgalore/main'
+include { FASTQ_FASTQC_UMITOOLS_TRIMGALORE as FASTQ_FASTQC_UMITOOLS_TRIMGALORE_AFTER_TRINITY } from '../subworkflows/nf-core/fastq_fastqc_umitools_trimgalore/main'
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp/main'
 include { FASTQ_ALIGN_HISAT2               } from '../subworkflows/nf-core/fastq_align_hisat2/main'
 include { BAM_SORT_STATS_SAMTOOLS          } from '../subworkflows/nf-core/bam_sort_stats_samtools/main'
@@ -560,7 +565,35 @@ if (params.single_end_sample) {
 ch_versions = ch_versions.mix(TrinityNormalizeReads_SingleEnd.out.versions)
 }
 
+if (params.fastqc_after_trinity)
+{
+        FASTQC_AFTER_TRINITY (ch_filtered_reads)
+        fastqc_html = FASTQC_AFTER_TRINITY.out.html
+        fastqc_zip  = FASTQC_AFTER_TRINITY.out.zip
+        ch_versions = ch_versions.mix(FASTQC_AFTER_TRINITY.out.versions.first())}
 
+//     //add params.fastqc_umitools_trimgalore_after_trinity=false
+//   if (params.trimmer == 'trimgalore' && params.fastqc_umitools_trimgalore_after_trinity) {
+//         FASTQ_FASTQC_UMITOOLS_TRIMGALORE_AFTER_TRINITY (
+//             //previous one: ch_strand_inferred_fastq,
+//             ch_filtered_reads, 
+//             params.skip_fastqc || params.skip_qc,
+//             params.with_umi,
+//             params.skip_umi_extract,
+//             params.skip_trimming,
+//             params.umi_discard_read,
+//             params.min_trimmed_reads
+//         )
+//        // previous one: ch_filtered_reads      = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.reads
+        
+//         ch_filtered_reads      = FASTQ_FASTQC_UMITOOLS_TRIMGALORE_AFTER_TRINITY.out.reads
+//         ch_fastqc_raw_multiqc  = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.fastqc_zip
+//         ch_fastqc_trim_multiqc = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.trim_zip
+//         ch_trim_log_multiqc    = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.trim_log
+//         ch_trim_read_count     = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.trim_read_count
+//         //previous one is  ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.versions)
+//         ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_TRIMGALORE_AFTER_TRINITY.out.versions)
+//     }
 
 
 
