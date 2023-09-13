@@ -111,6 +111,8 @@ include { TrinityNormalizeReads as TrinityNormalizeReads_DoubleEnd } from '../mo
 //fastq after trinity normalization
 include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
 
+//StringTie merge modules
+include {STRINGTIE_MERGE} from '../modules/local/stringTie_merge/main.nf'
 
 
 //
@@ -916,7 +918,7 @@ if (params.fastqc_after_trinity)
     }
 
     //
-    // MODULE: STRINGTIE
+    // MODULE: STRINGTIE_STRINGTIE
     //
     if (!params.skip_alignment && !params.skip_stringtie) {
         STRINGTIE_STRINGTIE (
@@ -925,6 +927,22 @@ if (params.fastqc_after_trinity)
         )
         ch_versions = ch_versions.mix(STRINGTIE_STRINGTIE.out.versions.first())
     }
+
+
+    //we add this
+    // MODULE: STRINGTIE_MERGE
+    //
+    if (!params.skip_alignment && !params.skip_stringtie) {
+        //modify the STRINGTIE_STRINGTIE output format to align the STRINGTIE_MERGE input format
+        ch_stringtie_gtf_only = STRINGTIE_STRINGTIE.out.transcript_gtf.map { meta, gtf -> return gtf }
+
+        STRINGTIE_MERGE (
+            ch_stringtie_gtf_only,
+            PREPARE_GENOME.out.gtf
+        )
+        ch_versions = ch_versions.mix(STRINGTIE_MERGE.out.versions.first())
+    }
+
 
     //
     // MODULE: Feature biotype QC using featureCounts
@@ -1213,3 +1231,7 @@ workflow.onComplete {
 
 //test are only single end input
 //nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_only_single/ -work-dir s3://mdibl-nextflow-work/dxu/test_only__single/ -resume 
+
+//Must master this. https://www.nextflow.io/docs/latest/process.html?highlight=path#input-type-path
+
+// nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_stringtie_merge_single_/ -work-dir s3://mdibl-nextflow-work/dxu/test_stringtie_merge_single/ -resume --double_end_sample= false  --single_end_sample     = true
