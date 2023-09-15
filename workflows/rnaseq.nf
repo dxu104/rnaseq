@@ -1199,7 +1199,7 @@ workflow.onComplete {
 // git merge origin/master or git merge origin/developbrach
 // sudo nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test_full,docker --outdir /compbio/scratch/dxu/newrnaseq/ -stub-run
 // nohup nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_18GB_2files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_2files_18G/ &> nextflow.out&
-
+//sudo nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_stringtie_merge_single_/ -work-dir s3://mdibl-nextflow-work/dxu/test_stringtie_merge_single/ -resume --double_end_sample= false  --single_end_sample     = true
 //cat nextflow.out
 ////tail nextflow.out
 //ps aux |grep nextflow
@@ -1234,4 +1234,7 @@ workflow.onComplete {
 
 //Must master this. https://www.nextflow.io/docs/latest/process.html?highlight=path#input-type-path
 
+//stringtie single end successfully
 // nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_stringtie_merge_single_/ -work-dir s3://mdibl-nextflow-work/dxu/test_stringtie_merge_single/ -resume --double_end_sample= false  --single_end_sample     = true
+
+//stringtie double end successfully
