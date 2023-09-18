@@ -578,7 +578,7 @@ if (params.fastqc_after_trinity)
 //   if (params.trimmer == 'trimgalore' && params.fastqc_umitools_trimgalore_after_trinity) {
 //         FASTQ_FASTQC_UMITOOLS_TRIMGALORE_AFTER_TRINITY (
 //             //previous one: ch_strand_inferred_fastq,
-//             ch_filtered_reads, 
+//             ch_filtered_reads,
 //             params.skip_fastqc || params.skip_qc,
 //             params.with_umi,
 //             params.skip_umi_extract,
@@ -587,7 +587,7 @@ if (params.fastqc_after_trinity)
 //             params.min_trimmed_reads
 //         )
 //        // previous one: ch_filtered_reads      = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.reads
-        
+
 //         ch_filtered_reads      = FASTQ_FASTQC_UMITOOLS_TRIMGALORE_AFTER_TRINITY.out.reads
 //         ch_fastqc_raw_multiqc  = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.fastqc_zip
 //         ch_fastqc_trim_multiqc = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.trim_zip
@@ -943,22 +943,25 @@ if (params.fastqc_after_trinity)
         ch_versions = ch_versions.mix(STRINGTIE_MERGE.out.versions.first())
     }
 
-
     //
     // MODULE: Feature biotype QC using featureCounts
     //
     ch_featurecounts_multiqc = Channel.empty()
     if (!params.skip_alignment && !params.skip_qc && !params.skip_biotype_qc && biotype) {
-
-        PREPARE_GENOME
+ //update our  genome reference gtf file after applying STRINGTIE_MERGE module
+    //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
+        STRINGTIE_MERGE
             .out
             .gtf
             .map { WorkflowRnaseq.biotypeInGtf(it, biotype, log) }
             .set { biotype_in_gtf }
 
         // Prevent any samples from running if GTF file doesn't have a valid biotype
+
+        //update our  genome reference gtf file after applying STRINGTIE_MERGE module
+    //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
         ch_genome_bam
-            .combine(PREPARE_GENOME.out.gtf)
+            .combine(STRINGTIE_MERGE.out.gtf)
             .combine(biotype_in_gtf)
             .filter { it[-1] }
             .map { it[0..<it.size()-1] }
@@ -1018,18 +1021,21 @@ if (params.fastqc_after_trinity)
     ch_tin_multiqc                = Channel.empty()
     if (!params.skip_alignment && !params.skip_qc) {
         if (!params.skip_qualimap) {
+                  //update our  genome reference gtf file after applying STRINGTIE_MERGE module
+    //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
             QUALIMAP_RNASEQ (
                 ch_genome_bam,
-                PREPARE_GENOME.out.gtf
+                STRINGTIE_MERGE.out.gtf
             )
             ch_qualimap_multiqc = QUALIMAP_RNASEQ.out.results
             ch_versions = ch_versions.mix(QUALIMAP_RNASEQ.out.versions.first())
         }
-
+             //update our  genome reference gtf file after applying STRINGTIE_MERGE module
+    //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
         if (!params.skip_dupradar) {
             DUPRADAR (
                 ch_genome_bam,
-                PREPARE_GENOME.out.gtf
+                STRINGTIE_MERGE.out.gtf
             )
             ch_dupradar_multiqc = DUPRADAR.out.multiqc
             ch_versions = ch_versions.mix(DUPRADAR.out.versions.first())
@@ -1085,11 +1091,13 @@ if (params.fastqc_after_trinity)
     ch_pseudoaligner_pca_multiqc        = Channel.empty()
     ch_pseudoaligner_clustering_multiqc = Channel.empty()
     if (!params.skip_pseudo_alignment && params.pseudo_aligner == 'salmon') {
+                   //update our  genome reference gtf file after applying STRINGTIE_MERGE module
+    //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
         QUANTIFY_SALMON (
             ch_filtered_reads,
             PREPARE_GENOME.out.salmon_index,
             ch_dummy_file,
-            PREPARE_GENOME.out.gtf,
+            STRINGTIE_MERGE.out.gtf,
             false,
             params.salmon_quant_libtype ?: ''
         )
@@ -1191,7 +1199,7 @@ workflow.onComplete {
     THE END
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
+//cat /proc/meminfo
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq
 // git branch
 //git checkout branchname
@@ -1207,34 +1215,11 @@ workflow.onComplete {
 //kill -9  1234
 
 
-//test tuplegroup  passing Trinity and salmon  Failed to sanitize XML document destined for handler class com.amazonaws.services.s3.model.transform.XmlResponsesSaxParser$ListBucketHandler
-//test tuplegroup command: nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_samplefile/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_grouptuple/
+//move the input file and json to the local laptop
+//scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/zfTest/ /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/
 
-//test Zebrafish  passing Trinity and salmon  Failed to sanitize XML document destined for handler class com.amazonaws.services.s3.model.transform.XmlResponsesSaxParser$ListBucketHandler
+//move the input file and json from local to the random
+//scp -r /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/* dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/launch_dir/
 
-// test Zebrafish  command: nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile docker -c Zebrafish_test.config -c  nextflow.AWSBatch.config --outdir s3://mdibl-dxu/ZeBraFish/ -work-dir s3://mdibl-nextflow-work/dxu/ZebraFish_Lastet/ -resume
 
-//testfull 8Gb*16 
-//testfull comand nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_100G/ -resume -work-dir s3://mdibl-nextflow-work/dxu/test_full_100G/ -resume
-
-//4 testfull 36GB 
-//command nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_36GB_4files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_4files_36G/ -resume 
-
-//2 testfull 18gb
-//command nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_18GB_2files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_2files_18G/
-
-//test input are only double, pass
-// nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_samplefile/ -work-dir s3://mdibl-nextflow-work/dxu/test_grouptuple/  -resume
-
-//test input are mix single and double input and pass all
-//nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_single_double/ -work-dir s3://mdibl-nextflow-work/dxu/test_single_double/ -resume
-
-//test are only single end input
-//nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_only_single/ -work-dir s3://mdibl-nextflow-work/dxu/test_only__single/ -resume 
-
-//Must master this. https://www.nextflow.io/docs/latest/process.html?highlight=path#input-type-path
-
-//stringtie single end successfully
-// nextflow run /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_stringtie_merge_single_/ -work-dir s3://mdibl-nextflow-work/dxu/test_stringtie_merge_single/ -resume --double_end_sample= false  --single_end_sample     = true
-
-//stringtie double end successfully
+// nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv -resume
