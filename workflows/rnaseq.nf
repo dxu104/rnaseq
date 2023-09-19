@@ -1199,19 +1199,50 @@ workflow.onComplete {
     THE END
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-//cat /proc/meminfo
-// cd /compbio/scratch/dxu/newrnaseq/rnaseq
-// git branch
-//git checkout branchname
-//git fetch origin
+
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    VALIDATE INPUTS
+
+To create the `StringTieMerge` branch on your remote server and synchronize it with your GitHub repository, follow these steps:
+
+1. **Navigate to your repository directory**:
+   ```bash
+   cd /path/to/your/repo
+   ```
+
+2. **Ensure your git repository is linked to the remote**:
+   ```
+   git remote -v
+   ```
+   This should display the URL of your GitHub repository. If it doesn't, you'll need to add it:
+   ```
+   git remote add origin YOUR_GITHUB_REPO_URL
+   ```
+
+3. **Fetch all updates from GitHub for all branches**:
+   ```
+   git fetch origin
+   ```
+
+4. **Switch to the `StringTieMerge` branch**. If this branch does not exist locally, you'll need to create and switch to it:
+   ```
+   git checkout -b StringTieMerge origin/StringTieMerge
+   ```
+
+By now, you should be on the `StringTieMerge` branch on your remote server, and it should be synchronized with the same branch in your GitHub repository.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
 // git merge origin/master or git merge origin/developbrach
-// sudo nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test_full,docker --outdir /compbio/scratch/dxu/newrnaseq/ -stub-run
-// nohup nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test_full,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_full_18GB_2files/  -work-dir s3://mdibl-nextflow-work/dxu/test_full_2files_18G/ &> nextflow.out&
-//sudo nextflow run /compbio/scratch/dxu/newrnaseq/rnaseq -profile test,docker -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/test_stringtie_merge_single_/ -work-dir s3://mdibl-nextflow-work/dxu/test_stringtie_merge_single/ -resume --double_end_sample= false  --single_end_sample     = true
+// -stub-run
 //cat nextflow.out
 ////tail nextflow.out
 //ps aux |grep nextflow
 // top  ctrl+S to lock the screen
+//ps -u dxu
 //kill -9  1234
 
 
@@ -1221,5 +1252,11 @@ workflow.onComplete {
 //move the input file and json from local to the random
 //scp -r /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/* dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/launch_dir/
 
+//use -bg to run in the background https://www.nextflow.io/docs/latest/cli.html?highlight=bg
+// nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv --double_end_sample true -resume -bg
 
-// nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv -resume
+
+
+//nohup nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv double_end_sample = true -resume &> nextflow.out&
+//cat /proc/meminfo
+// cd /compbio/scratch/dxu/newrnaseq/rnaseq
