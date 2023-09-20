@@ -1237,6 +1237,8 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 */
 
 // git merge origin/master or git merge origin/developbrach
+
+
 // -stub-run
 //cat nextflow.out
 ////tail nextflow.out
@@ -1255,6 +1257,8 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //use -bg to run in the background https://www.nextflow.io/docs/latest/cli.html?highlight=bg
 // nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv --double_end_sample true -resume -bg
 
+//memverge
+//nextflow run main.nf -profile test,docker -c float.config -with-tower --gene_prefix='AM-MIDBLv00003'  -params-file ../launch_dir/zfTest/zf_params_memverge.json  --double_end_sample true -resume -bg
 
 
 //nohup nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv double_end_sample = true -resume &> nextflow.out&
