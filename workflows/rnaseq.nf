@@ -1256,13 +1256,17 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //scp -r /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/* dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/launch_dir/
 
 //use -bg to run in the background https://www.nextflow.io/docs/latest/cli.html?highlight=bg
-// nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv --double_end_sample true -resume -bg
+// nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-20-23_AWSBatch -params-file ../launch_dir/zfTestAWSBatch/zf_params_AWSBatch.json   -bg
 
 //memverge
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemverge/float.config -with-tower  -params-file ../launch_dir/zfTestMemverge/zf_params_memverge.json  -resume -bg
 
 //memverge ondeman
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/zfTestMemvergeOndemand/zf_params_memvergeOndemand.json -bg
+
+
+//memverge ondeman two samples delete transmit
+//nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemverge2samples/float.config -with-tower  -params-file ../launch_dir/zfTestMemverge2samples/zf_params_memverge.json -bg
 
 //nohup nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv double_end_sample = true -resume &> nextflow.out&
 //cat /proc/meminfo
