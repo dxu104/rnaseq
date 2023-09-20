@@ -9,7 +9,7 @@ process TrinityNormalizeReads {
 
     input:
     tuple val(meta), path(reads)
-     
+
 
 
     output:
@@ -62,7 +62,7 @@ process TrinityNormalizeReads {
             paired_file="${id}_2_val_2.${file#*.}"
         elif [[ $file =~ "_1.fastq.gz" || $file =~ "_1.fq.gz" ]]; then
             id=$(echo $file | sed 's/_1.*//')
-            paired_file="${id}_2.${file#*.}"      
+            paired_file="${id}_2.${file#*.}"
         else
             id=$(basename "$file" | rev | cut -d "." -f 3- | rev)
         fi
@@ -79,9 +79,9 @@ process TrinityNormalizeReads {
             echo -e "$id\t$id\t$abs_file" >> samplesheet.tsv
         fi
     done
-      
 
-        
+
+
 
     Trinity \\
         --seqType fq \\
@@ -89,7 +89,6 @@ process TrinityNormalizeReads {
         --max_memory $avail_mem \\
         --output ${prefix}_trinity \\
         --CPU $task.cpus \\
-        --normalize_by_read_set \\
         --just_normalize_reads
 
      #Use fuzzy matching to find all files matching the *.norm.*.fq pattern.
@@ -107,6 +106,7 @@ done
     END_VERSIONS
 '''
 }
+// --normalize_by_read_set \\
 //In terms of "id=$(echo $file ... part", We will get anything before the following String pattern
 //_1_val_1.fastq.gz
 //_2_val_2.fastq.gz
@@ -114,8 +114,8 @@ done
 //_R2.fastq.gz
 //_1.fastq.gz
 // _2.fastq.gz
-//  
-// ''  
+//
+// ''
 //     # Ensure the samplesheet.tsv file is empty or create it
 //     > samplesheet.tsv
 
@@ -144,7 +144,7 @@ done
 //             paired_file="${id}_2_val_2.${file#*.}"
 //         elif [[ $file =~ "_1.fastq.gz" || $file =~ "_1.fq.gz" ]]; then
 //             id=$(echo $file | sed 's/_1.*//')
-//             paired_file="${id}_2.${file#*.}"      
+//             paired_file="${id}_2.${file#*.}"
 //         else
 //             id=$(basename "$file" | rev | cut -d "." -f 3- | rev)
 //         fi

@@ -9,7 +9,7 @@ process TrinityNormalizeReads {
 
     input:
     tuple val(meta), path(reads)
-     
+
 
 
     output:
@@ -35,7 +35,7 @@ process TrinityNormalizeReads {
      //template 'generate_samplesheet.sh'
     // def samplesheet_path=$(realpath samplesheet.tsv)
     """
-    
+
     # Ensure the samplesheet.tsv file is empty or create it
     > samplesheet.tsv
 
@@ -63,10 +63,10 @@ process TrinityNormalizeReads {
             paired_file="\${id}_2_val_2.\${file#*.}"
         elif [[ \$file =~ "_1.fastq.gz" || \$file =~ "_1.fq.gz" ]]; then
             id=\$(echo \$file | sed 's/_1.*//')
-            paired_file="\${id}_2.\${file#*.}"  
+            paired_file="\${id}_2.\${file#*.}"
         elif [[ \$file =~ "_1.fastp.fastq.gz" || \$file =~ "_1.fastp.fq.gz" ]]; then
             id=\$(echo \$file | sed 's/_1.*//')
-            paired_file="\${id}_2.\${file#*.}"          
+            paired_file="\${id}_2.\${file#*.}"
         else
             id=\$(basename "\$file" | rev | cut -d "." -f 3- | rev)
         fi
@@ -83,19 +83,11 @@ process TrinityNormalizeReads {
             echo -e "\$id\t\$id\t\$abs_file" >> samplesheet.tsv
         fi
     done
-    
 
 
-    Trinity \\
-        --seqType fq \\
-        --samples_file samplesheet.tsv \\
-        --max_memory ${avail_mem}G \\
-        --output ${prefix}_trinity \\
-        --CPU $task.cpus \\
-        --normalize_by_read_set \\
-        --just_normalize_reads
-        
-      
+
+     
+
 
 #Use fuzzy matching to find all files matching the *.norm.*.fq pattern.
 #For each matched file, compress its contents using gzip -c and save the compressed contents to a new file with the original filename with the .gz suffix appended via Redirect >.
@@ -105,7 +97,7 @@ process TrinityNormalizeReads {
 found_files=\$(find . -type f -name "*.fq")
 if [[ -n "\$found_files" ]]; then
     find . -type f -name "*.fq" | while read -r file; do
-        echo "Processing file: \$file" 
+        echo "Processing file: \$file"
         gzip -cf "\$file" > "\${file}.gz"
         echo "Compressed to: \${file}.gz"
     done
@@ -113,7 +105,7 @@ else
     echo "No files matching the pattern were found."
 fi
 
-  
+
 cat <<-END_VERSIONS > versions.yml
 "${task.process}":
     trinity: \$(echo \$(Trinity --version | head -n 1 2>&1) | sed 's/^Trinity version: Trinity-v//' ))
@@ -129,8 +121,8 @@ END_VERSIONS
 //_R2.fastq.gz
 //_1.fastq.gz
 // _2.fastq.gz
-//  
-// ''  
+//
+// ''
 //     # Ensure the samplesheet.tsv file is empty or create it
 //     > samplesheet.tsv
 
@@ -159,7 +151,7 @@ END_VERSIONS
 //             paired_file="${id}_2_val_2.${file#*.}"
 //         elif [[ $file =~ "_1.fastq.gz" || $file =~ "_1.fq.gz" ]]; then
 //             id=$(echo $file | sed 's/_1.*//')
-//             paired_file="${id}_2.${file#*.}"      
+//             paired_file="${id}_2.${file#*.}"
 //         else
 //             id=$(basename "$file" | rev | cut -d "." -f 3- | rev)
 //         fi
