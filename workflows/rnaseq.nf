@@ -1173,6 +1173,7 @@ if (params.fastqc_after_trinity)
             ch_tin_multiqc.collect{it[1]}.ifEmpty([])
         )
         multiqc_report = MULTIQC.out.report.toList()
+
     }
 }
 
@@ -1259,7 +1260,9 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //memverge
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemverge/float.config -with-tower  -params-file ../launch_dir/zfTestMemverge/zf_params_memverge.json  -resume -bg
-//nextflow run main.nf -profile docker -c float.config -with-tower  -params-file ../launch_dir/zfTestMemverge/zf_params_memverge.json  -resume -bg
+
+//memverge ondeman
+//nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/zfTestMemvergeOndemand/zf_params_memvergeOndemand.json -bg
 
 //nohup nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv double_end_sample = true -resume &> nextflow.out&
 //cat /proc/meminfo
