@@ -13,7 +13,7 @@ process TrinityNormalizeReads {
 
 
     output:
-    tuple val(meta), path("*_trinity/insilico_read_normalization_altogether/*.norm.*.fq.gz"), emit: normalized_files
+    tuple val(meta), path("*_trinity/*/*.fq.gz"), emit: normalized_files
     path "versions.yml"  , emit: versions
 
 
@@ -68,6 +68,7 @@ process TrinityNormalizeReads {
             id=\$(basename "\$file" | rev | cut -d "." -f 3- | rev)
         fi
 
+        echo "Processing file: \$file"
 
         # Get absolute path for the file
         abs_file=\$(realpath "\$file")
