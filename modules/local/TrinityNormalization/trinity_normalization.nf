@@ -86,7 +86,7 @@ process TrinityNormalizeReads {
     Trinity \\
         --seqType fq \\
         --samples_file samplesheet.tsv \\
-        --max_memory $avail_mem \\
+        --max_memory ${avail_mem}G \\
         --output ${prefix}_trinity \\
         --CPU $task.cpus \\
         --normalize_by_read_set \\
