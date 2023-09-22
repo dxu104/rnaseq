@@ -1274,3 +1274,4 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //nohup nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv double_end_sample = true -resume &> nextflow.out&
 //cat /proc/meminfo
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq
+// cat modules/local/TrinityNormalization/trinity_normalization.nf
