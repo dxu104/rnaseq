@@ -34,7 +34,7 @@ process TrinityNormalizeReads {
 
      //template 'generate_samplesheet.sh'
     // def samplesheet_path=$(realpath samplesheet.tsv)
-    """
+"""
 
     # Ensure the samplesheet.tsv file is empty or create it
     > samplesheet.tsv
@@ -67,7 +67,7 @@ process TrinityNormalizeReads {
         else
             id=\$(basename "\$file" | rev | cut -d "." -f 3- | rev)
         fi
-        
+
         # Get absolute path for the file
         abs_file=\$(realpath "\$file")
 
