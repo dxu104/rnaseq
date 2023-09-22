@@ -1280,3 +1280,4 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq_copy
 
 //tmux attach -t
+//cat modules/local/TrinityNormalization/trinity_normalization.nf
