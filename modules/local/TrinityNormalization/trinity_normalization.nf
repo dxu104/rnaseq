@@ -55,21 +55,19 @@ process TrinityNormalizeReads {
 
         paired_file=""
         # Determine if the file is R1, _1_val_1, or single-end and set paired_file accordingly
-        if [[ \$file =~ "_R1.fastq.gz" || \$file =~ "_R1.fq.gz" ]]; then
-             id=\$(echo \$file | sed 's/_R1.*//')
+        if [[ \$file =~ "_R1(.non_rRNA)?.(fastq|fq).gz" ]]; then
+            id=\$(echo \$file | sed 's/_R1.*//')
             paired_file="\${id}_R2.\${file#*.}"
-        elif [[ \$file =~ "_1_val_1.fastq.gz" || \$file =~ "_1_val_1.fq.gz" ]]; then
+        elif [[ \$file =~ "_1_val_1(.non_rRNA)?.(fastq|fq).gz" ]]; then
             id=\$(echo \$file | sed 's/_1_val_1.*//')
             paired_file="\${id}_2_val_2.\${file#*.}"
-        elif [[ \$file =~ "_1.fastq.gz" || \$file =~ "_1.fq.gz" ]]; then
-            id=\$(echo \$file | sed 's/_1.*//')
-            paired_file="\${id}_2.\${file#*.}"
-        elif [[ \$file =~ "_1.fastp.fastq.gz" || \$file =~ "_1.fastp.fq.gz" ]]; then
+        elif [[ \$file =~ "_1(.non_rRNA)?(.fastp)?.(fastq|fq).gz" ]]; then
             id=\$(echo \$file | sed 's/_1.*//')
             paired_file="\${id}_2.\${file#*.}"
         else
             id=\$(basename "\$file" | rev | cut -d "." -f 3- | rev)
         fi
+
 
         # Get absolute path for the file
         abs_file=\$(realpath "\$file")
