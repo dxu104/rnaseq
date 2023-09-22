@@ -67,7 +67,7 @@ process TrinityNormalizeReads {
         else
             id=\$(basename "\$file" | rev | cut -d "." -f 3- | rev)
         fi
-
+        
         # Get absolute path for the file
         abs_file=\$(realpath "\$file")
 
