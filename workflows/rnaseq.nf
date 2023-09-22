@@ -1265,12 +1265,16 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/zfTestMemvergeOndemand/zf_params_memvergeOndemand.json -bg
 
 //memverge ondeman smallest test file
-//nextflow run main.nf -profile test, docker -c ../launch_dir/smallestTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/smallestTestMemvergeOndemand/zf_params_memvergeOndemand.json -bg
+//nextflow run main.nf -profile test,docker -c ../launch_dir/smallestTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/smallestTestMemvergeOndemand/zf_params_memvergeOndemand.json -bg
 
 
-//memverge ondeman two samples delete transmit
+//memverge ondeman two samples delete transmit without normalization by read set
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemverge2samples/float.config -with-tower  -params-file ../launch_dir/zfTestMemverge2samples/zf_params_memverge.json -resume
+
+//memverge ondeman two samples delete transmit and with normalization by read set
+//nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemverge2samplesnormalize_by_read_set/float.config -with-tower  -params-file ../launch_dir/zfTestMemverge2samplesnormalize_by_read_set/zf_params_memverge.json
 
 //nohup nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower --gene_prefix='AM-MIDBLv00003' -work-dir s3://mdibl-nextflow-work/dxu/zfish18files_09-18-23/ -params-file ../launch_dir/zfTest/zf_params.json --input ../launch_dir/zfTest/zfSamples.csv double_end_sample = true -resume &> nextflow.out&
 //cat /proc/meminfo
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq
+// cd /compbio/scratch/dxu/newrnaseq/rnaseq_copy
