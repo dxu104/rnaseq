@@ -49,7 +49,7 @@ process TrinityNormalizeReads {
         echo "Processing file: \$file"
 
         # Skip if file is an R2 or _2 file
-        if [[ \$file =~ "_R2.fastq.gz"  || \$file =~ "_R2.fq.gz" || \$file =~ "_2_val_2.fastq.gz" || \$file =~ "_2_val_2.fq.gz" || \$file =~ "_2.fastq.gz" || \$file =~ "_2.fq.gz" || \$file =~ "_2.fastp.fq.gz" || \$file =~ "_2.fastp.fastq.gz" ]]; then
+        if [[ \$file =~ "_R2(\.non_rRNA)?\.(fastq|fq)\.gz" || \$file =~ "_2_val_2(\.non_rRNA)?\.(fastq|fq)\.gz" || \$file =~ "_2(\.non_rRNA)?(\.fastp)?\.(fastq|fq)\.gz" ]]; then
             continue
         fi
 
