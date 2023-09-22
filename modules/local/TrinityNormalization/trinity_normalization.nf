@@ -49,22 +49,19 @@ process TrinityNormalizeReads {
         echo "Processing file: \$file"
 
         # Skip if file is an R2 or _2 file
-        if [[ \$file =~ "_R2.fastq.gz"  || \$file =~ "_R2.fq.gz" || \$file =~ "_2_val_2.fastq.gz" || \$file =~ "_2_val_2.fq.gz" || \$file =~ "_2.fastq.gz" || \$file =~ "_2.fq.gz" || \$file =~ "_2.fastp.fq.gz" || \$file =~ "_2.fastp.fastq.gz" ]]; then
+        if [[ \$file =~ "_R2(\.non_rRNA)?\.(fastq|fq)\.gz" || \$file =~ "_2_val_2(\.non_rRNA)?\.(fastq|fq)\.gz" || \$file =~ "_2(\.non_rRNA)?(\.fastp)?\.(fastq|fq)\.gz" ]]; then
             continue
         fi
 
         paired_file=""
         # Determine if the file is R1, _1_val_1, or single-end and set paired_file accordingly
-        if [[ \$file =~ "_R1.fastq.gz" || \$file =~ "_R1.fq.gz" ]]; then
-             id=\$(echo \$file | sed 's/_R1.*//')
+        if [[ \$file =~ "_R1(\.non_rRNA)?\.(fastq|fq)\.gz" ]]; then
+            id=\$(echo \$file | sed 's/_R1.*//')
             paired_file="\${id}_R2.\${file#*.}"
-        elif [[ \$file =~ "_1_val_1.fastq.gz" || \$file =~ "_1_val_1.fq.gz" ]]; then
+        elif [[ \$file =~ "_1_val_1(\.non_rRNA)?\.(fastq|fq)\.gz" ]]; then
             id=\$(echo \$file | sed 's/_1_val_1.*//')
             paired_file="\${id}_2_val_2.\${file#*.}"
-        elif [[ \$file =~ "_1.fastq.gz" || \$file =~ "_1.fq.gz" ]]; then
-            id=\$(echo \$file | sed 's/_1.*//')
-            paired_file="\${id}_2.\${file#*.}"
-        elif [[ \$file =~ "_1.fastp.fastq.gz" || \$file =~ "_1.fastp.fq.gz" ]]; then
+        elif [[ \$file =~ "_1(\.non_rRNA)?(\.fastp)?\.(fastq|fq)\.gz" ]]; then
             id=\$(echo \$file | sed 's/_1.*//')
             paired_file="\${id}_2.\${file#*.}"
         else
@@ -86,7 +83,7 @@ process TrinityNormalizeReads {
 
 
 
-     
+
 
 
 #Use fuzzy matching to find all files matching the *.norm.*.fq pattern.
