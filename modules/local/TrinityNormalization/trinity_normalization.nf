@@ -48,20 +48,20 @@ process TrinityNormalizeReads {
 
         echo "Processing file: \$file"
 
-        # Skip if file is an R2 or _2 file
-        if [[ \$file =~ "_R2(.non_rRNA)?.(fastq|fq).gz" || \$file =~ "_2_val_2(.non_rRNA)?.(fastq|fq).gz" || \$file =~ "_2(.non_rRNA)?(.fastp)?.(fastq|fq).gz" ]]; then
+     # Skip if file is an R2 or _2 file
+        if [[ \$file =~ "_R2(\.non_rRNA)?\.(fastq|fq)\.gz" || \$file =~ "_2_val_2(\.non_rRNA)?\.(fastq|fq)\.gz" || \$file =~ "_2(\.non_rRNA)?(\.fastp)?\.(fastq|fq)\.gz" ]]; then
             continue
         fi
 
         paired_file=""
         # Determine if the file is R1, _1_val_1, or single-end and set paired_file accordingly
-        if [[ \$file =~ "_R1(.non_rRNA)?.(fastq|fq).gz" ]]; then
+        if [[ \$file =~ "_R1(\.non_rRNA)?\.(fastq|fq)\.gz" ]]; then
             id=\$(echo \$file | sed 's/_R1.*//')
             paired_file="\${id}_R2.\${file#*.}"
-        elif [[ \$file =~ "_1_val_1(.non_rRNA)?.(fastq|fq).gz" ]]; then
+        elif [[ \$file =~ "_1_val_1(\.non_rRNA)?\.(fastq|fq)\.gz" ]]; then
             id=\$(echo \$file | sed 's/_1_val_1.*//')
             paired_file="\${id}_2_val_2.\${file#*.}"
-        elif [[ \$file =~ "_1(.non_rRNA)?(.fastp)?.(fastq|fq).gz" ]]; then
+        elif [[ \$file =~ "_1(\.non_rRNA)?(\.fastp)?\.(fastq|fq)\.gz" ]]; then
             id=\$(echo \$file | sed 's/_1.*//')
             paired_file="\${id}_2.\${file#*.}"
         else
