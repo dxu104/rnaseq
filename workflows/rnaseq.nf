@@ -551,6 +551,14 @@ if (params.single_end_sample) {
 // Using mix to combine the two channels to create ch_filtered_reads channel
 ch_filtered_reads = ch_normalized_double_end_files.mix(ch_normalized_single_end_files)
 
+//since we do not use trinity normalization by read set,we only can get one fastq.gz file.
+if(params.trinity_normalization_by_read_set) {
+    ch_filtered_reads = ch_filtered_reads.map { meta, file ->
+        meta.single_end = true
+        return [meta, file]
+    }
+}
+
 // Giving ch_filtered_reads an alias to adapt to the input pattern of STAR
 ch_filtered_reads_for_star = ch_filtered_reads
 
@@ -1278,7 +1286,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //cat /proc/meminfo
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq_copy
-
+// cd /compbio/scratch/dxu/newrnaseq/rnaseq_smallest_test_delete_read_by_set
 //tmux attach -t
-//tmux kill-session -t 
+//tmux kill-session -t
 //cat modules/local/TrinityNormalization/trinity_normalization.nf
