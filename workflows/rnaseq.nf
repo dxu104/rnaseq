@@ -1273,7 +1273,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/zfTestMemvergeOndemand/zf_params_memvergeOndemand.json -bg
 
 //memverge ondeman smallest test file
-//nextflow run main.nf -profile test,docker -c ../launch_dir/smallestTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/smallestTestMemvergeOndemand/zf_params_memvergeOndemand.json  --trinity_normalization_by_read_set false -resume
+//nextflow run main.nf -profile test,docker -c ../launch_dir/smallestTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/smallestTestMemvergeOndemand/zf_params_memvergeOndemand.json  -resume
 
 
 //memverge ondeman two samples delete transmit without normalization by read set
