@@ -34,6 +34,7 @@ process TrinityNormalizeReads {
 
      //template 'generate_samplesheet.sh'
     // def samplesheet_path=$(realpath samplesheet.tsv)
+
     """
 
     # Ensure the samplesheet.tsv file is empty or create it
@@ -48,24 +49,24 @@ process TrinityNormalizeReads {
 
         echo "Processing file: \$file"
 
-     # Skip if file is an R2 or _2 file
-        if [[ \$file =~ "_R2(\.non_rRNA)?\.(fastq|fq)\.gz" || \$file =~ "_2_val_2(\.non_rRNA)?\.(fastq|fq)\.gz" || \$file =~ "_2(\.non_rRNA)?(\.fastp)?\.(fastq|fq)\.gz" ]]; then
-            continue
+        # Skip if file is an R2 or _2 file
+        if [[ \$file =~ "_R2(\\.non_rRNA)?\\.(fastq|fq)\\.gz" || \$file =~ "_2_val_2(\\.non_rRNA)?\\.(fastq|fq)\\.gz" || \$file =~ "_2(\\.non_rRNA)?(\\.fastp)?\\.(fastq|fq)\\.gz" ]]; then
+        continue
         fi
 
         paired_file=""
         # Determine if the file is R1, _1_val_1, or single-end and set paired_file accordingly
-        if [[ \$file =~ "_R1(\.non_rRNA)?\.(fastq|fq)\.gz" ]]; then
-            id=\$(echo \$file | sed 's/_R1.*//')
-            paired_file="\${id}_R2.\${file#*.}"
-        elif [[ \$file =~ "_1_val_1(\.non_rRNA)?\.(fastq|fq)\.gz" ]]; then
-            id=\$(echo \$file | sed 's/_1_val_1.*//')
-            paired_file="\${id}_2_val_2.\${file#*.}"
-        elif [[ \$file =~ "_1(\.non_rRNA)?(\.fastp)?\.(fastq|fq)\.gz" ]]; then
-            id=\$(echo \$file | sed 's/_1.*//')
-            paired_file="\${id}_2.\${file#*.}"
+        if [[ \$file =~ "_R1(\\.non_rRNA)?\\.(fastq|fq)\\.gz" ]]; then
+        id=\$(echo \$file | sed 's/_R1.*//')
+        paired_file="\${id}_R2.\${file#*.}"
+        elif [[ \$file =~ "_1_val_1(\\.non_rRNA)?\\.(fastq|fq)\\.gz" ]]; then
+        id=\$(echo \$file | sed 's/_1_val_1.*//')
+        paired_file="\${id}_2_val_2.\${file#*.}"
+        elif [[ \$file =~ "_1(\\.non_rRNA)?(\\.fastp)?\\.(fastq|fq)\\.gz" ]]; then
+        id=\$(echo \$file | sed 's/_1.*//')
+        paired_file="\${id}_2.\${file#*.}"
         else
-            id=\$(basename "\$file" | rev | cut -d "." -f 3- | rev)
+        id=\$(basename "\$file" | rev | cut -d "." -f 3- | rev)
         fi
 
         echo "Processing file: \$file"
@@ -90,13 +91,6 @@ process TrinityNormalizeReads {
         --output ${prefix}_trinity \\
         --CPU $task.cpus \\
         --just_normalize_reads
-
-
-
-
-
-
-
 
 #Use fuzzy matching to find all files matching the *.norm.*.fq pattern.
 #For each matched file, compress its contents using gzip -c and save the compressed contents to a new file with the original filename with the .gz suffix appended via Redirect >.
