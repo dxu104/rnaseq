@@ -1270,7 +1270,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemverge/float.config -with-tower  -params-file ../launch_dir/zfTestMemverge/zf_params_memverge.json  -resume -bg
 
 //memverge ondeman
-//nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/zfTestMemvergeOndemand/zf_params_memvergeOndemand.json -bg
+//nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/zfTestMemvergeOndemand/zf_params_memvergeOndemand.json -resume
 
 //memverge ondeman smallest test file
 //nextflow run main.nf -profile test,docker -c ../launch_dir/smallestTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/smallestTestMemvergeOndemand/zf_params_memvergeOndemand.json  -resume
