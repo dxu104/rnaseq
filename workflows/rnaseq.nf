@@ -486,7 +486,7 @@ ch_samples_double_end = ch_filtered_reads
 
 
 ch_samples_double_end
-    .map { it.collate(2) }
+    .buffer(size: 2)
       .map {
             meta, fastq ->
                 new_id = 'all_double'
@@ -554,7 +554,7 @@ if (params.single_end_sample) {
 
 
     ch_samples_single_end
-          .map { it.collate(2) }
+          .buffer(size: 2)
           .map {
                 meta, fastq ->
                     new_id = 'all_single'
