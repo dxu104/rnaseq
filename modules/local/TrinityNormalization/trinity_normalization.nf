@@ -36,64 +36,37 @@ process TrinityNormalizeReads {
     // def samplesheet_path=$(realpath samplesheet.tsv)
 
     """
-
-    # Ensure the samplesheet.tsv file is empty or create it
     > samplesheet.tsv
 
-    # Loop through all fastq.gz and fq.gz files
-    for file in *.{fastq,fq}.gz; do
-        # Check if the file actually exists
+    for file in *.fq.gz; do
         if [[ ! -e \$file ]]; then
             continue
         fi
 
-        echo "Processing file: \$file"
+        echo "prcessing files: \$file"
 
-        # Skip if file is an R2 or _2 file
-        if [[ \$file =~ "_R2.fastq.gz" || \$file =~ "_R2.non_rRNA.fastq.gz" ||
-            \$file =~ "_R2.fq.gz" || \$file =~ "_R2.non_rRNA.fq.gz" ||
-            \$file =~ "_2_val_2.fastq.gz" || \$file =~ "_2_val_2.non_rRNA.fastq.gz" ||
-            \$file =~ "_2_val_2.fq.gz" || \$file =~ "_2_val_2.non_rRNA.fq.gz" ||
-            \$file =~ "_2.fastq.gz" || \$file =~ "_2.non_rRNA.fastq.gz" ||
-            \$file =~ "_2.fq.gz" || \$file =~ "_2.non_rRNA.fq.gz" ||
-            \$file =~ "_2.fastp.fq.gz" || \$file =~ "_2.fastp.non_rRNA.fq.gz" ||
-            \$file =~ "_2.fastp.fastq.gz" || \$file =~ "_2.fastp.non_rRNA.fastq.gz"
-            ]]; then
+        prefix=\$(echo \$file | cut -d'.' -f1)  # 用来获取文件名的第一个点之前的部分
+        last_char=\${prefix: -1}
+
+        if [[ "\$last_char" == "2" ]]; then
             continue
         fi
 
-        # Determine if the file is R1, _1_val_1, or single-end and set paired_file accordingly
-        if [[ \$file =~ "_R1.fastq.gz" || \$file =~ "_R1.non_rRNA.fastq.gz" ||
-            \$file =~ "_R1.fq.gz" || \$file =~ "_R1.non_rRNA.fq.gz" ]]; then
-            id=\$(echo \$file | sed 's/_R1.*//')
-            paired_file="\${id}_R2.\${file#*.}"
-        elif [[ \$file =~ "_1_val_1.fastq.gz" || \$file =~ "_1_val_1.non_rRNA.fastq.gz" ||
-                \$file =~ "_1_val_1.fq.gz" || \$file =~ "_1_val_1.non_rRNA.fq.gz" ]]; then
-            id=\$(echo \$file | sed 's/_1_val_1.*//')
-            paired_file="\${id}_2_val_2.\${file#*.}"
-        elif [[ \$file =~ "_1.fastq.gz" || \$file =~ "_1.non_rRNA.fastq.gz" ||
-                \$file =~ "_1.fq.gz" || \$file =~ "_1.non_rRNA.fq.gz" ]]; then
-            id=\$(echo \$file | sed 's/_1.*//')
-            paired_file="\${id}_2.\${file#*.}"
-        elif [[ \$file =~ "_1.fastp.fastq.gz" || \$file =~ "_1.fastp.non_rRNA.fastq.gz" ||
-                \$file =~ "_1.fastp.fq.gz" || \$file =~ "_1.fastp.non_rRNA.fq.gz" ]]; then
-            id=\$(echo \$file | sed 's/_1.*//')
+        if [[ \$last_char == "1" ]]; then
+            id=\$(echo \$prefix | sed 's/_1$//')
             paired_file="\${id}_2.\${file#*.}"
         else
-            id=\$(basename "\$file" | rev | cut -d "." -f 3- | rev)
+            id=\$prefix
         fi
 
-        echo "Processing file: \$file"
+        echo "prcessing files after trimming: \$file"
 
-        # Get absolute path for the file
         abs_file=\$(realpath "\$file")
 
-        # If it's a paired-end read, check if paired_file exists and get its absolute path
         if [[ -n \$paired_file && -e \$paired_file ]]; then
             abs_paired=\$(realpath "\$paired_file")
             echo -e "\$id\t\$id\t\$abs_file\t\$abs_paired" >> samplesheet.tsv
         elif [[ -z \$paired_file ]]; then
-            # For single-end reads, only output the single file path
             echo -e "\$id\t\$id\t\$abs_file" >> samplesheet.tsv
         fi
     done

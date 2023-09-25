@@ -108,6 +108,7 @@ include { TrinityNormalizeReads as TrinityNormalizeReads_DoubleEnd } from '../mo
 // include { Staging as Staging_SingleEnd } from '../modules/local/create_samples_file_staging.nf'
 // include { Staging as Staging_DoubleEnd } from '../modules/local/create_samples_file_staging.nf'
 
+include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL} from '../../modules/local/trinity.nf'
 //fastq after trinity normalization
 include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
 
@@ -118,6 +119,7 @@ include {STRINGTIE_MERGE} from '../modules/local/stringTie_merge/main.nf'
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
+include { TRINITY_NORMALIZATION  } from '../subworkflows/local/trinity_normalization'
 include { INPUT_CHECK    } from '../subworkflows/local/input_check'
 include { PREPARE_GENOME } from '../subworkflows/local/prepare_genome'
 include { ALIGN_STAR     } from '../subworkflows/local/align_star'
@@ -388,6 +390,13 @@ workflow RNASEQ {
         ch_sortmerna_multiqc = SORTMERNA.out.log
         ch_versions = ch_versions.mix(SORTMERNA.out.versions.first())
 }
+   //simultaneously run Trinity to expedite the run time
+    TRINITY_NORMALIZATION_PARALLEL(ch_filtered_reads)
+
+    // collect() to collect all  transcript_fasta
+    ch_trinity_normalization_parallel = TRINITY_NORMALIZATION_PARALLEL.out.transcript_fastq.collect()
+
+    ch_versions = ch_versions.mix(TRINITY_NORMALIZATION_PARALLEL.out.versions)
 
 
 
@@ -455,10 +464,14 @@ workflow RNASEQ {
 // ch_single_end_samples.out.single_end_samples.view{ txt ->
 //     "Staging Single Content: $txt"
 // }
+
+
+//second time to run trinity using sample_file flag
+
 Channel.empty().set { ch_normalized_double_end_files }
 
 if (params.double_end_sample) {
-ch_samples_double_end = ch_filtered_reads
+ch_samples_double_end = ch_trinity_normalization_parallel
     .filter { meta, path ->
         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
     }
@@ -515,7 +528,7 @@ TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { meta, file ->
 Channel.empty().set { ch_normalized_single_end_files }
 
 if (params.single_end_sample) {
-    ch_samples_single_end = ch_filtered_reads
+    ch_samples_single_end = ch_trinity_normalization_parallel
         .filter { meta, path ->
             meta.single_end == true
         }
