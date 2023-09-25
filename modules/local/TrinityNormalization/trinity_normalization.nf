@@ -45,18 +45,19 @@ process TrinityNormalizeReads {
 
         echo "prcessing files: \$file"
 
-        prefix=\$(echo \$file | cut -d'.' -f1)  # 用来获取文件名的第一个点之前的部分
-        last_char=\${prefix: -1}
+        id=\$(basename "\$file" | cut -d '.' -f 1)
+        #prefix=\$(echo \$id | rev | cut -d '_' -f 2- | rev)
+        last_char=\${id: -1}
 
         if [[ "\$last_char" == "2" ]]; then
             continue
         fi
 
         if [[ \$last_char == "1" ]]; then
-            id=\$(echo \$prefix | sed 's/_1$//')
+            id=\$(echo \$id |sed 's/_1.*//')
             paired_file="\${id}_2.\${file#*.}"
         else
-            id=\$prefix
+            id=\$id
         fi
 
         echo "prcessing files after trimming: \$file"
