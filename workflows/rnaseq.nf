@@ -481,6 +481,15 @@ ch_samples_double_end = ch_filtered_reads
     ch_samples_double_end.view(){ txt ->
     "After collect Double End Sample Text Content: $txt"
 }
+//content: After collect Double End Sample Text Content: [[id:WT_REP2, single_e$
+//d:false, strandedness:reverse], [/mdibl-nextflow-work/dxu/smallestTe$
+//t_09-21-23_memvergeOndemand/bc/0ebf4af46bc94032d4ca63992cb586/WT_REP$_trinity/insilico_read_normalization/WT_REP2_1.non_rRNA.fastq.gz.nor$alized_K25_maxC200_minC1_maxCV10000.fq.gz, /mdibl-nextflow-work/dxu/$mallestTest_09-21-23_memvergeOndemand/bc/0ebf4af46bc94032d4ca63992cb$86/WT_REP2_trinity/insilico_read_normalization/WT_REP2_2.non_rRNA.fa$tq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz], [id:RAP1_IAA_3$M_REP1, single_end:false, strandedness:reverse], [/mdibl-nextflow-wo$k/dxu/smallestTest_09-21-23_memvergeOndemand/1d/28e9bf4beb47b6d67d85$68a1686ba/RAP1_IAA_30M_REP1_trinity/insilico_read_normalization/RAP1$IAA_30M_REP1_1.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV1$000.fq.gz, /mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOn$emand/1d/28e9bf4beb47b6d67d85e68a1686ba/RAP1_IAA_30M_REP1_trinity/in$ilico_read_normalization/RAP1_IAA_30M_REP1_2.non_rRNA.fastq.gz.norma$ized_K25_maxC200_minC1_maxCV10000.fq.gz], [id:WT_REP1, single_end:fa$se, strandedness:reverse], [/mdibl-nextflow-work/dxu/smallestTest_09$
+//21-23_memvergeOndemand/6b/b07512ad1f50d8dc7a6ab8a07481ed/WT_REP1_trin
+//ity/insilico_read_normalization/WT_REP1_1.non_rRNA.fastq.gz.normalize
+//d_K25_maxC200_minC1_maxCV10000.fq.gz, /mdibl-nextflow-work/dxu/smalle
+//stTest_09-21-23_memvergeOndemand/6b/b07512ad1f50d8dc7a6ab8a07481ed/WT
+//_REP1_trinity/insilico_read_normalization/WT_REP1_2.non_rRNA.fastq.gz
+//d/.normalized_K25_maxC200_minC1_maxCV10000.fq.gz]]
 
     ch_versions = ch_versions.mix(TRINITY_NORMALIZATION_PARALLEL_DoubleEnd.out.versions)
 
@@ -518,6 +527,7 @@ ch_inputfor_double_TrinityNormalization.view { txt ->
 }
 //Output
 //Double End Sample Text Content: [[id:all, single_end:false, strandedness:reverse], [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/56/1390d8482d6e054da0495b8ca2aaa4/WT_REP2_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/56/1390d8482d6e054da0495b8ca2aaa4/WT_REP2_primary_2.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/18/0fe6ad3e9ec70616e41ef120163c20/RAP1_IAA_30M_REP1_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/18/0fe6ad3e9ec70616e41ef120163c20/RAP1_IAA_30M_REP1_primary_2.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/98/d1faae18131d045010bbf81d22eb35/WT_REP1_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/98/d1faae18131d045010bbf81d22eb35/WT_REP1_primary_2.fastq.gz]]
+}
 
 TrinityNormalizeReads_DoubleEnd(ch_inputfor_double_TrinityNormalization)
 
@@ -529,7 +539,7 @@ TrinityNormalizeReads_DoubleEnd.out.normalized_files.view { meta, file ->
     "Normalized Double End File: Sample ID: ${meta.id}, File Name: $file.name | Path: $file"
 }
 
-}
+
 //Take look this!!
 //Normalized Double End File: Sample ID: all, File Name: [left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq] | Path: [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/e7/25404dede3fc0aa04868df4abc13f7/results_trinity/insilico_read_normalization_altogether/left.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/e7/25404dede3fc0aa04868df4abc13f7/results_trinity/insilico_read_normalization_altogether/right.norm.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq]
 
