@@ -488,11 +488,10 @@ ch_versions = ch_versions.mix(TRINITY_NORMALIZATION_PARALLEL_DoubleEnd.out.versi
 
 
 
-
 // Use a separate list for file paths
 filePaths = []
-// Store the metadata from the first item
-metadata = ['id':'all']
+// Initialize metadata as an empty Map
+metadata = [:]
 
 // Counter for index
 counter = 0
@@ -500,23 +499,24 @@ counter = 0
 ch_inputfor_double_TrinityNormalization = ch_samples_double_end
 .transpose()
     .flatMap { item ->
-        if (counter == 0) {
+        // Check if the item is a Map and the counter is 0
+        if (item instanceof Map && counter == 0) {
             // Save metadata from the first item
             metadata['single_end'] = item['single_end']
             metadata['strandedness'] = item['strandedness']
+            metadata['id'] = 'all'
         }
-        if (counter++ % 2 == 1) {
-            // Add file paths
+        // If the counter is odd, add file paths
+        if (counter++ % 2 == 1 && item instanceof List) {
             filePaths += item.flatten()
         }
-        return item // 返回项目而不是 null
+        return item
     }
-    .filter { it != null } // 过滤掉 null 的项目
+    .filter { it != null }
     .toList()
     .map {
         return [metadata, filePaths.flatten()]
     }
-
 
    //  ch_samples_double_end =  ch_samples_double_end.buffer(2)
 
