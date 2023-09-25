@@ -481,38 +481,44 @@ ch_samples_double_end = ch_filtered_reads
     ch_samples_double_end.view(){ txt ->
     "After collect Double End Sample Text Content: $txt"
 }
-//content: After collect Double End Sample Text Content: [[id:WT_REP2, single_e$
-//d:false, strandedness:reverse], [/mdibl-nextflow-work/dxu/smallestTe$
-//t_09-21-23_memvergeOndemand/bc/0ebf4af46bc94032d4ca63992cb586/WT_REP$_trinity/insilico_read_normalization/WT_REP2_1.non_rRNA.fastq.gz.nor$alized_K25_maxC200_minC1_maxCV10000.fq.gz, /mdibl-nextflow-work/dxu/$mallestTest_09-21-23_memvergeOndemand/bc/0ebf4af46bc94032d4ca63992cb$86/WT_REP2_trinity/insilico_read_normalization/WT_REP2_2.non_rRNA.fa$tq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz], [id:RAP1_IAA_3$M_REP1, single_end:false, strandedness:reverse], [/mdibl-nextflow-wo$k/dxu/smallestTest_09-21-23_memvergeOndemand/1d/28e9bf4beb47b6d67d85$68a1686ba/RAP1_IAA_30M_REP1_trinity/insilico_read_normalization/RAP1$IAA_30M_REP1_1.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV1$000.fq.gz, /mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOn$emand/1d/28e9bf4beb47b6d67d85e68a1686ba/RAP1_IAA_30M_REP1_trinity/in$ilico_read_normalization/RAP1_IAA_30M_REP1_2.non_rRNA.fastq.gz.norma$ized_K25_maxC200_minC1_maxCV10000.fq.gz], [id:WT_REP1, single_end:fa$se, strandedness:reverse], [/mdibl-nextflow-work/dxu/smallestTest_09$
-//21-23_memvergeOndemand/6b/b07512ad1f50d8dc7a6ab8a07481ed/WT_REP1_trin
-//ity/insilico_read_normalization/WT_REP1_1.non_rRNA.fastq.gz.normalize
-//d_K25_maxC200_minC1_maxCV10000.fq.gz, /mdibl-nextflow-work/dxu/smalle
-//stTest_09-21-23_memvergeOndemand/6b/b07512ad1f50d8dc7a6ab8a07481ed/WT
-//_REP1_trinity/insilico_read_normalization/WT_REP1_2.non_rRNA.fastq.gz
-//d/.normalized_K25_maxC200_minC1_maxCV10000.fq.gz]]
 
-    ch_versions = ch_versions.mix(TRINITY_NORMALIZATION_PARALLEL_DoubleEnd.out.versions)
+ch_versions = ch_versions.mix(TRINITY_NORMALIZATION_PARALLEL_DoubleEnd.out.versions)
+
+//After collect Double End Sample Text Content: [[id:RAP1_IAA_30M_REP1, single_end:false, strandedness:reverse], [/mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/53/b37e086f0061c70d750d1b453eac97/RAP1_IAA_30M_REP1_trinity/insilico_read_normalization/RAP1_IAA_30M_REP1_1.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz, /mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/53/b37e086f0061c70d750d1b453eac97/RAP1_IAA_30M_REP1_trinity/insilico_read_normalization/RAP1_IAA_30M_REP1_2.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz], [id:WT_REP2, single_end:false, strandedness:reverse], [/mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/7a/c567da50264ddcc70e57c27720bdb7/WT_REP2_trinity/insilico_read_normalization/WT_REP2_1.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz, /mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/7a/c567da50264ddcc70e57c27720bdb7/WT_REP2_tMonitor the execution with Nextflow Tower using this URL: https://tower.nf/orgs/MDIBL-Biocore/workspaces/Memverge/watch/5R3w7digPTZxbMexecutor >  float (32)[ac/a3170f] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[e2/d4240c] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[2a/343603] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[a9/434460] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[7b/5cc81d] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[d0/6cce9c] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔
 
 
-ch_samples_double_end
-    .buffer(size: 2)
-      .map {
-            meta, fastq ->
-                new_id = 'all_double'
-                [ meta + [id: new_id], fastq.flatten() ]
+
+
+// Use a separate list for file paths
+filePaths = []
+// Store the metadata from the first item
+metadata = ['id':'all']
+
+// Counter for index
+counter = 0
+
+ch_inputfor_double_TrinityNormalization = ch_samples_double_end
+.transpose()
+    .flatMap { item ->
+        if (counter == 0) {
+            // Save metadata from the first item
+            metadata['single_end'] = item['single_end']
+            metadata['strandedness'] = item['strandedness']
         }
-        .groupTuple()
-        .map {
-            meta, fastq ->
-                [ meta, fastq.flatten() ]
+        if (counter++ % 2 == 1) {
+            // Add file paths
+            filePaths += item.flatten()
         }
-    .set { ch_inputfor_double_TrinityNormalization}
+        return item // 返回项目而不是 null
+    }
+    .filter { it != null } // 过滤掉 null 的项目
+    .toList()
+    .map {
+        return [metadata, filePaths.flatten()]
+    }
+
+
    //  ch_samples_double_end =  ch_samples_double_end.buffer(2)
-
-
-
-
-
 
     //delete storeDir option .,then samples.txt will be in the work directory like 3c/d2lj4l2j2l424
     //collectFile(name: 'samples.txt', newLine: true, storeDir:"${params.outdir}/sortmerna", sort:true)
