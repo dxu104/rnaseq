@@ -487,38 +487,43 @@ ch_versions = ch_versions.mix(TRINITY_NORMALIZATION_PARALLEL_DoubleEnd.out.versi
 //After collect Double End Sample Text Content: [[id:RAP1_IAA_30M_REP1, single_end:false, strandedness:reverse], [/mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/53/b37e086f0061c70d750d1b453eac97/RAP1_IAA_30M_REP1_trinity/insilico_read_normalization/RAP1_IAA_30M_REP1_1.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz, /mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/53/b37e086f0061c70d750d1b453eac97/RAP1_IAA_30M_REP1_trinity/insilico_read_normalization/RAP1_IAA_30M_REP1_2.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz], [id:WT_REP2, single_end:false, strandedness:reverse], [/mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/7a/c567da50264ddcc70e57c27720bdb7/WT_REP2_trinity/insilico_read_normalization/WT_REP2_1.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz, /mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/7a/c567da50264ddcc70e57c27720bdb7/WT_REP2_tMonitor the execution with Nextflow Tower using this URL: https://tower.nf/orgs/MDIBL-Biocore/workspaces/Memverge/watch/5R3w7digPTZxbMexecutor >  float (32)[ac/a3170f] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[e2/d4240c] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[2a/343603] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[a9/434460] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[7b/5cc81d] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[d0/6cce9c] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔
 
 
-
-// Use a separate list for file paths
-filePaths = []
-// Initialize metadata as an empty Map
-metadata = [:]
-
-// Counter for index
-counter = 0
-
-ch_inputfor_double_TrinityNormalization = ch_samples_double_end
-.transpose()
-    .flatMap { item ->
-        // Check if the item is a Map and the counter is 0
-        if (item instanceof Map && counter == 0) {
-            // Save metadata from the first item
-            metadata['single_end'] = item['single_end']
-            metadata['strandedness'] = item['strandedness']
-            metadata['id'] = 'all'
+ch_samples_double_end
+.toList()
+    .map { samples ->
+        // samples 现在是一个列表
+        new_samples_list = []
+        for(int i = 0; i < samples.size(); i+=2) {
+            new_samples_list << [samples[i], samples[i+1]]
         }
-        // If the counter is odd, add file paths
-        if (counter++ % 2 == 1 && item instanceof List) {
-            filePaths += item.flatten()
-        }
-        return item
-    }
-    .filter { it != null }
-    .toList()
-    .map {
-        return [metadata, filePaths.flatten()]
-    }
+        return new_samples_list
+    }.set {ch_inputfor_double_TrinityNormalization  }
 
-   //  ch_samples_double_end =  ch_samples_double_end.buffer(2)
+       ch_inputfor_double_TrinityNormalization
+      .flatMap()
+      .map {
+
+            meta, fastq ->
+
+                new_id = 'all_double'
+
+                [ meta + [id: new_id], fastq.flatten() ]
+
+        }
+
+        .groupTuple(
+
+        )
+
+        .map {
+
+            meta, fastq ->
+
+                [ meta, fastq.flatten() ]
+
+        }
+
+
+       //  ch_samples_double_end =  ch_samples_double_end.buffer(2)
 
     //delete storeDir option .,then samples.txt will be in the work directory like 3c/d2lj4l2j2l424
     //collectFile(name: 'samples.txt', newLine: true, storeDir:"${params.outdir}/sortmerna", sort:true)
