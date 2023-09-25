@@ -502,9 +502,9 @@ ch_inputfor_double_TrinityNormalization = ch_samples_double_end
         // Check if the item is a Map and the counter is 0
         if (item instanceof Map && counter == 0) {
             // Save metadata from the first item
-            metadata['single_end'] = item['single_end']
-            metadata['strandedness'] = item['strandedness']
-            metadata['id'] = 'all'
+            metadata[single_end] = item[single_end]
+            metadata[strandedness] = item[strandedness]
+            metadata[id] = 'all'
         }
         // If the counter is odd, add file paths
         if (counter++ % 2 == 1 && item instanceof List) {
