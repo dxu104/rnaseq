@@ -497,6 +497,7 @@ ch_samples_double_end
         }
         return new_samples_list
     }.set {ch_inputfor_double_TrinityNormalization  }
+    ch_inputfor_double_TrinityNormalization.view()
 
        ch_inputfor_double_TrinityNormalization
       .flatMap()
@@ -520,7 +521,7 @@ ch_samples_double_end
 
                 [ meta, fastq.flatten() ]
 
-        }
+        }.set{ch_inputfor_double_TrinityNormalization}
 
 
        //  ch_samples_double_end =  ch_samples_double_end.buffer(2)
