@@ -29,7 +29,7 @@ process TrinityNormalizeReads {
     if (!task.memory) {
         log.info '[Trinity] Available memory not known - defaulting to 7GB. Specify process memory requirements to change this.'
     } else {
-        avail_mem = (task.memory.giga*0.8).intValue()
+        avail_mem = (task.memory.giga*0.95).intValue()
     }
 
      //template 'generate_samplesheet.sh'

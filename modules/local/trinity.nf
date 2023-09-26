@@ -1,6 +1,6 @@
 process TRINITY_NORMALIZATION {
     tag "$meta.id"
-    label 'process_Trinity_Normalization'
+    label 'process_Trinity_Normalization_Parallel'
 
     conda "bioconda::trinity=2.13.2"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -35,7 +35,7 @@ process TRINITY_NORMALIZATION {
     if (!task.memory) {
         log.info '[Trinity] Available memory not known - defaulting to 50GB. Specify process memory requirements to change this.'
     } else {
-        avail_mem = (task.memory.giga*0.8).intValue()
+        avail_mem = (task.memory.giga*0.95).intValue()
     }
 
     """
