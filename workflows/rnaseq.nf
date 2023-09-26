@@ -478,16 +478,13 @@ ch_samples_double_end = ch_filtered_reads
     // collect() to collect all  transcript_fasta
     ch_samples_double_end= TRINITY_NORMALIZATION_PARALLEL_DoubleEnd.out.transcript_fastq.collect()
 
-    ch_samples_double_end.view(){ txt ->
-    "After collect Double End Sample Text Content: $txt"
-}
+//    
 
 ch_versions = ch_versions.mix(TRINITY_NORMALIZATION_PARALLEL_DoubleEnd.out.versions)
 
 //After collect Double End Sample Text Content: [[id:RAP1_IAA_30M_REP1, single_end:false, strandedness:reverse], [/mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/53/b37e086f0061c70d750d1b453eac97/RAP1_IAA_30M_REP1_trinity/insilico_read_normalization/RAP1_IAA_30M_REP1_1.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz, /mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/53/b37e086f0061c70d750d1b453eac97/RAP1_IAA_30M_REP1_trinity/insilico_read_normalization/RAP1_IAA_30M_REP1_2.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz], [id:WT_REP2, single_end:false, strandedness:reverse], [/mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/7a/c567da50264ddcc70e57c27720bdb7/WT_REP2_trinity/insilico_read_normalization/WT_REP2_1.non_rRNA.fastq.gz.normalized_K25_maxC200_minC1_maxCV10000.fq.gz, /mdibl-nextflow-work/dxu/smallestTest_09-21-23_memvergeOndemand/7a/c567da50264ddcc70e57c27720bdb7/WT_REP2_tMonitor the execution with Nextflow Tower using this URL: https://tower.nf/orgs/MDIBL-Biocore/workspaces/Memverge/watch/5R3w7digPTZxbMexecutor >  float (32)[ac/a3170f] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[e2/d4240c] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[2a/343603] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[a9/434460] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[7b/5cc81d] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔[d0/6cce9c] process > NFCORE_RNASEQ:RN... [100%] 1 of 1 ✔
 
 ch_samples_double_end
-          .flatten()
           .collate(2)
           .map {
                 meta, fastq ->
@@ -500,8 +497,10 @@ ch_samples_double_end
                     [ meta, fastq.flatten() ]
             }.set{ch_inputfor_double_TrinityNormalization}
 
+             ch_inputfor_double_TrinityNormalization.view{ "Meta: ${it[0]}, Path: ${it[1]}" }
 
-       //  ch_samples_double_end =  ch_samples_double_end.buffer(2)
+
+
 
     //delete storeDir option .,then samples.txt will be in the work directory like 3c/d2lj4l2j2l424
     //collectFile(name: 'samples.txt', newLine: true, storeDir:"${params.outdir}/sortmerna", sort:true)
@@ -510,10 +509,7 @@ ch_samples_double_end
 //Single End Sample Text Content: [[id:all, single_end:true, strandedness:reverse], [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/37/5d62886bd8a4d5bd9f253a68314d6b/RAP1_UNINDUCED_REP1_primary.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/74/ef82426b7ac641fdaf48f1a4b8bb2f/RAP1_UNINDUCED_REP2_primary.fastq.gz]]
 
 
-// for double end
-ch_inputfor_double_TrinityNormalization.view { txt ->
-    "Double End Sample Text Content: $txt"
-}
+
 //Output
 //Double End Sample Text Content: [[id:all, single_end:false, strandedness:reverse], [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/56/1390d8482d6e054da0495b8ca2aaa4/WT_REP2_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/56/1390d8482d6e054da0495b8ca2aaa4/WT_REP2_primary_2.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/18/0fe6ad3e9ec70616e41ef120163c20/RAP1_IAA_30M_REP1_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/18/0fe6ad3e9ec70616e41ef120163c20/RAP1_IAA_30M_REP1_primary_2.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/98/d1faae18131d045010bbf81d22eb35/WT_REP1_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/98/d1faae18131d045010bbf81d22eb35/WT_REP1_primary_2.fastq.gz]]
 }
