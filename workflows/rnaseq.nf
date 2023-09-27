@@ -1324,5 +1324,6 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq_copy
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq_smallest_test_delete_read_by_set
 //tmux attach -t
-//tmux kill-session -t
+//tmux new -s your session name
+//tmux kill-session -t your session name
 //cat modules/local/TrinityNormalization/trinity_normalization.nf
