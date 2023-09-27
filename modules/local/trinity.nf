@@ -47,7 +47,7 @@ process TRINITY_NORMALIZATION {
     ${reads_args} \\
     --output ${prefix}_trinity \\
     --CPU $task.cpus \\
-    --max_cov 30           \\
+    --normalize_max_read_cov 30           \\
     --just_normalize_reads\\
     $args
 

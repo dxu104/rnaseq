@@ -78,7 +78,7 @@ process TrinityNormalizeReads {
         --max_memory ${avail_mem}G \\
         --output ${prefix}_trinity \\
         --CPU $task.cpus \\
-        --max_cov 30      \\
+        --normalize_max_read_cov 30      \\
         --just_normalize_reads
 
 #Use fuzzy matching to find all files matching the *.norm.*.fq pattern.
