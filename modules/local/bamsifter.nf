@@ -9,7 +9,7 @@ process BAMSIFTER {
     tuple val(meta), path(alignment_bam)
 
     output:
-    tuple val(meta), path ("*.bam")                     , emit: alignments_bam
+    tuple val(meta), path ("*.bam")                     , emit: normalized_bam
     //path "versions.yml"                    , emit: versions
 
     when:
