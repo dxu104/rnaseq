@@ -380,7 +380,9 @@ workflow RNASEQ {
     ch_sortmerna_multiqc = Channel.empty()
     if (params.remove_ribo_rna) {
         ch_sortmerna_fastas = Channel.from(ch_ribo_db.readLines()).map { row -> file(row, checkIfExists: true) }.collect()
-
+//why we can use collect() to get ch_sortmerna_fastas, and pass ch_sortmerna_fastas into SORTMERNA?
+// but do not use collect() for ch_filtered_reads because collect will broke the tuple stucture
+//and collect() will not broke the structure for ch_sortmerna_fastas
         SORTMERNA (
             ch_filtered_reads,
             ch_sortmerna_fastas
@@ -642,35 +644,6 @@ if (params.fastqc_after_trinity)
 //     }
 
 
-
-
-
-// // Mapping for single-end files
-// ch_normalized_single_end_files_to_filtered = ch_normalized_single_end_files
-//     .map { file ->
-//         // Extract the file path
-//         def path = [file]  // Note that there's only one file here
-
-//         // Set meta data
-//         def meta = ['id': 'FastQ_ReadyforStar_single', 'single_end': true, 'strandedness': 'auto']
-
-//         return [meta, path]
-//     }
-
-// // Mapping for double-end files, similar to before
-// ch_normalized_double_end_files_to_filtered = ch_normalized_double_end_files
-//     .map { file ->
-//         // Extract the file paths
-//         def path = [file[0], file[1]]
-
-//         // Set meta data
-//         def meta = ['id': 'FastQ_ReadyforStar_double', 'single_end': false, 'strandedness': 'auto']
-
-//         return [meta, path]
-//     }
-
-
-
    // SUBWORKFLOW: Alignment with STAR and gene/transcript quantification with Salmon
 
     ch_genome_bam                 = Channel.empty()
@@ -885,6 +858,10 @@ if (params.fastqc_after_trinity)
             ch_versions = ch_versions.mix(BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.versions)
         }
     }
+
+
+
+
 
     //
     // Filter channels to get samples that passed STAR minimum mapping percentage
@@ -1327,3 +1304,5 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //tmux new -s your session name
 //tmux kill-session -t your session name
 //cat modules/local/TrinityNormalization/trinity_normalization.nf
+//command to verify after bamsifter bam file is sorted or not.
+//samtools view -H /Users/xudecheng/MDIBL/Nextflow_Training/training/nf-training/work/7f/72cc6dcb609daad458534d22045a3a/all_double_copy.reads.bam | grep 'SO:'

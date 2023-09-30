@@ -35,7 +35,7 @@ process TRINITY_NORMALIZATION {
     if (!task.memory) {
         log.info '[Trinity] Available memory not known - defaulting to 50GB. Specify process memory requirements to change this.'
     } else {
-        avail_mem = (task.memory.giga*0.95).intValue()
+        avail_mem = (task.memory.giga-2).intValue()
     }
 
     """
