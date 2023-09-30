@@ -102,14 +102,17 @@ include { MULTIQC                            } from '../modules/local/multiqc'
 include { MULTIQC_CUSTOM_BIOTYPE             } from '../modules/local/multiqc_custom_biotype'
 include { UMITOOLS_PREPAREFORRSEM as UMITOOLS_PREPAREFORSALMON } from '../modules/local/umitools_prepareforrsem.nf'
 //customized modules
-include { TrinityNormalizeReads as TrinityNormalizeReads_SingleEnd } from '../modules/local/TrinityNormalization/trinity_normalization.nf'
-include { TrinityNormalizeReads as TrinityNormalizeReads_DoubleEnd } from '../modules/local/TrinityNormalization/trinity_normalization.nf'
+// include { TrinityNormalizeReads as TrinityNormalizeReads_SingleEnd } from '../modules/local/TrinityNormalization/trinity_normalization.nf'
+// include { TrinityNormalizeReads as TrinityNormalizeReads_DoubleEnd } from '../modules/local/TrinityNormalization/trinity_normalization.nf'
 //include { CreateSampleFile } from '../modules/local/Samples_file_for_trinity_normalization.nf'
 // include { Staging as Staging_SingleEnd } from '../modules/local/create_samples_file_staging.nf'
 // include { Staging as Staging_DoubleEnd } from '../modules/local/create_samples_file_staging.nf'
 
-include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL_DoubleEnd} from '../modules/local/trinity.nf'
-include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL_SingleEnd} from '../modules/local/trinity.nf'
+include { BAMSIFTER  } from '../modules/local/bamsifter.nf'
+include { BAMSIFTER as BAMSIFTER_NORMALIZATION_MERGED_BAM} from '../modules/local/bamsifter.nf'
+include { SAMTOOLS_MERGE } from '../modules/local/samtools_merge.nf'
+// include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL_DoubleEnd} from '../modules/local/trinity.nf'
+// include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL_SingleEnd} from '../modules/local/trinity.nf'
 
 //fastq after trinity normalization
 include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
@@ -396,74 +399,7 @@ workflow RNASEQ {
 }
 
 
-
-
-
-    //  we do not need the header, but good to know the content.
-    //    Channel
-    // .value(['id', 'strandedness', 'read_1', 'read_2'].join('\t'))
-    // .set { ch_header }
-
-    // Create samples file of single end data for Trinity normalization
-    // ch_samples_single_end = ch_filtered_reads
-    // .filter { meta, path ->
-    //     meta.single_end == true
-    // }
-    // .map { meta, path ->
-    //     def read1 = path.toString().replaceFirst("^/", "s3://")
-    //     return [meta.id, "${meta.id}_${meta.strandedness}", read1, ""].join('\t')
-    // }
-    // .collectFile(name: 'samples_single_end.txt', newLine: true, sort: true)
-
-// ch_samples_single_end = ch_filtered_reads
-//     .filter { meta, path ->
-//         meta.single_end == true
-//     }
-//     .map { meta, path ->
-//         def read1 = path.toString()
-//         return [meta.id, "${meta.id}_${meta.strandedness}", read1, ""].join('\t')
-//     }
-//     .collectFile(name: 'samples_single_end.txt', newLine: true, sort: true)
-
-// Create samples file of double end data for Trinity normalization
-
-// ch_samples_double_end = ch_filtered_reads
-//     .filter { meta, path ->
-//         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
-//     }
-//     .map { meta, path ->
-//         def read1 = path[0].toString().replaceFirst("^/", "s3://")
-//         def read2 = path[1].toString().replaceFirst("^/", "s3://")
-//         return [meta.id, "${meta.id}_${meta.strandedness}", read1, read2].join('\t')
-//     }
-//     .collectFile(name: 'samples_double_end.txt', newLine: true, sort: true)
-
-// ch_samples_double_end = ch_filtered_reads
-//     .filter { meta, path ->
-//         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
-//     }
-//     .map { meta, path ->
-//         def read1 = path[0].toString()
-//         def read2 = path[1].toString()
-//         return [meta.id, "${meta.id}_${meta.strandedness}", read1, read2].join('\t')
-//     }
-//     .collectFile(name: 'samples_double_end.txt', newLine: true, sort: true)
-
-
-
-
-
-
-    //ch_samples_single_end =  ch_samples_single_end.buffer(1)
-
-// ch_samples_single_end=Staging_SingleEnd(ch_filtered_reads_single_end)
-
-// ch_single_end_samples.out.single_end_samples.view{ txt ->
-//     "Staging Single Content: $txt"
-// }
-
-
-//second time to run trinity using sample_file flag
+/*
 
 Channel.empty().set { ch_normalized_double_end_files }
 
@@ -506,16 +442,6 @@ ch_versions = ch_versions.mix(TRINITY_NORMALIZATION_PARALLEL_DoubleEnd.out.versi
             ch_inputfor_double_TrinityNormalization.view{ "Ready for Second Trinity  Meta: ${it[0]}, Path: ${it[1]}" }
 
 
-    //delete storeDir option .,then samples.txt will be in the work directory like 3c/d2lj4l2j2l424
-    //collectFile(name: 'samples.txt', newLine: true, storeDir:"${params.outdir}/sortmerna", sort:true)
-
-//Output
-//Single End Sample Text Content: [[id:all, single_end:true, strandedness:reverse], [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/37/5d62886bd8a4d5bd9f253a68314d6b/RAP1_UNINDUCED_REP1_primary.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/74/ef82426b7ac641fdaf48f1a4b8bb2f/RAP1_UNINDUCED_REP2_primary.fastq.gz]]
-
-
-
-//Output
-//Double End Sample Text Content: [[id:all, single_end:false, strandedness:reverse], [/Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/56/1390d8482d6e054da0495b8ca2aaa4/WT_REP2_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/56/1390d8482d6e054da0495b8ca2aaa4/WT_REP2_primary_2.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/18/0fe6ad3e9ec70616e41ef120163c20/RAP1_IAA_30M_REP1_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/18/0fe6ad3e9ec70616e41ef120163c20/RAP1_IAA_30M_REP1_primary_2.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/98/d1faae18131d045010bbf81d22eb35/WT_REP1_primary_1.fastq.gz, /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/work/98/d1faae18131d045010bbf81d22eb35/WT_REP1_primary_2.fastq.gz]]
 
 
 TrinityNormalizeReads_DoubleEnd(ch_inputfor_double_TrinityNormalization)
@@ -613,35 +539,20 @@ if (params.single_end_sample) {
 ch_versions = ch_versions.mix(TrinityNormalizeReads_SingleEnd.out.versions)
 }
 
+
+
 if (params.fastqc_after_trinity)
 {
         FASTQC_AFTER_TRINITY (ch_filtered_reads)
         fastqc_html = FASTQC_AFTER_TRINITY.out.html
         fastqc_zip  = FASTQC_AFTER_TRINITY.out.zip
-        ch_versions = ch_versions.mix(FASTQC_AFTER_TRINITY.out.versions.first())}
+        ch_versions = ch_versions.mix(FASTQC_AFTER_TRINITY.out.versions.first())} */
 
-//     //add params.fastqc_umitools_trimgalore_after_trinity=false
-//   if (params.trimmer == 'trimgalore' && params.fastqc_umitools_trimgalore_after_trinity) {
-//         FASTQ_FASTQC_UMITOOLS_TRIMGALORE_AFTER_TRINITY (
-//             //previous one: ch_strand_inferred_fastq,
-//             ch_filtered_reads,
-//             params.skip_fastqc || params.skip_qc,
-//             params.with_umi,
-//             params.skip_umi_extract,
-//             params.skip_trimming,
-//             params.umi_discard_read,
-//             params.min_trimmed_reads
-//         )
-//        // previous one: ch_filtered_reads      = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.reads
 
-//         ch_filtered_reads      = FASTQ_FASTQC_UMITOOLS_TRIMGALORE_AFTER_TRINITY.out.reads
-//         ch_fastqc_raw_multiqc  = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.fastqc_zip
-//         ch_fastqc_trim_multiqc = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.trim_zip
-//         ch_trim_log_multiqc    = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.trim_log
-//         ch_trim_read_count     = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.trim_read_count
-//         //previous one is  ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.versions)
-//         ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_TRIMGALORE_AFTER_TRINITY.out.versions)
-//     }
+
+
+
+
 
 
    // SUBWORKFLOW: Alignment with STAR and gene/transcript quantification with Salmon
@@ -666,6 +577,10 @@ if (params.fastqc_after_trinity)
             is_aws_igenome,
             PREPARE_GENOME.out.fasta.map { [ [:], it ] }
         )
+        //please check subworkflow align_stat, you will found emit： bam            = BAM_SORT_STATS_SAMTOOLS.out.bam
+        // and module/nf-core star/align/main.nf
+
+
         ch_genome_bam        = ALIGN_STAR.out.bam
         ch_genome_bam_index  = ALIGN_STAR.out.bai
         ch_transcriptome_bam = ALIGN_STAR.out.bam_transcript
@@ -745,7 +660,59 @@ if (params.fastqc_after_trinity)
                 .single_end
                 .mix(UMITOOLS_PREPAREFORSALMON.out.bam)
                 .set { ch_transcriptome_bam }
+                ch_transcriptome_bam.view{ "Ready for bamsifter  Meta: ${it[0]}, Path: ${it[1]}" }
         }
+
+// BAMSIFTER normalizes the bam files in parallel.
+
+    BAMSIFTER(ch_genome_bam )
+
+// put all the bamsifter outputs into a single channel
+    BAMSIFTER.out.alignments_bam.collect()
+    .flatMap()
+            .map {
+                 item ->
+            if(item instanceof Map) {
+            item['id'] = 'all_double'
+            return item
+            } else {
+            return item
+            }
+            }
+            .collate(2)
+            .groupTuple()
+            .map {
+            meta, fastq ->
+            [ meta, fastq.flatten() ]
+            }
+            .set{ch_bamstifer_ready_samtools_merged}
+            ch_bamstifer_ready_samtools_merged.view{ "Ready for Samtools_Merge  Meta: ${it[0]}, Path: ${it[1]}" }
+
+        // Merge all the bam files using samtools merge
+        //before merging, we need to sort the bam files
+        //Forturnately, we have the bam files sorted in the previous step
+        //and after we normalize the bam files, those normalized bam files are also sorted.
+
+    SAMTOOLS_MERGE(ch_bamstifer_ready_samtools_merged)
+     ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions.first())
+
+    SAMTOOLS_MERGE.out.merged_bam.view()
+
+    //
+
+    BAMSIFTER_NORMALIZATION_MERGED_BAM(SAMTOOLS_MERGE.out.merged_bam)
+    ch_genome_bam=BAMSIFTER_NORMALIZATION_MERGED_BAM.out.normalized_bam
+    ch_genome_bam.view()
+
+
+
+
+
+
+
+
+
+
 
         //
         // SUBWORKFLOW: Count reads from BAM alignments using Salmon
@@ -1306,3 +1273,5 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //cat modules/local/TrinityNormalization/trinity_normalization.nf
 //command to verify after bamsifter bam file is sorted or not.
 //samtools view -H /Users/xudecheng/MDIBL/Nextflow_Training/training/nf-training/work/7f/72cc6dcb609daad458534d22045a3a/all_double_copy.reads.bam | grep 'SO:'
+//–outSAMtype: type of output. Default is BAM Unsorted; STAR outputs unsorted Aligned.out.bam file(s). “The paired ends of an alignment are always adjacent, and multiple alignments of a read are adjacent as well. This ”unsorted” file cannot be directly used with downstream software such as HTseq, without the need of name sorting.” We therefore prefer the option BAM SortedByCoordinate
+
