@@ -558,6 +558,7 @@ ch_filtered_reads = ch_filtered_reads
     .filter { meta, path ->
         meta.single_end == false || meta.single_end == null  // null is for the case of undefined
     }
+}
 
 
 //In terms of Single end
