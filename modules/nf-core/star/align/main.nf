@@ -20,8 +20,8 @@ process STAR_ALIGN {
     tuple val(meta), path('*Log.out')         , emit: log_out
     tuple val(meta), path('*Log.progress.out'), emit: log_progress
     path  "versions.yml"                      , emit: versions
-
-    tuple val(meta), path('*d.out.bam')              , optional:true, emit: bam
+    // annotate th the below line
+    //tuple val(meta), path('*d.out.bam')              , optional:true, emit: bam
     //you should use this STAR_ALIGN.out.bam_sorted for rnaseq/subworkflows/local/align_star.nf
     // instead STAR_ALIGN.out.bam
     tuple val(meta), path('*sortedByCoord.out.bam')  , optional:true, emit: bam_sorted
