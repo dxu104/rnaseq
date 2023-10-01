@@ -626,12 +626,12 @@ if (params.single_end_sample) {
 
 
 
-    SAMTOOLS_SORT_BAM(ch_genome_bam)
+    // SAMTOOLS_SORT_BAM(ch_genome_bam)
 
-    ch_genome_bam        = SAMTOOLS_SORT_BAM.out.bam
-    //ch_genome_bam_index = SAMTOOLS_SORT_BAM.out.cai
+    // ch_genome_bam        = SAMTOOLS_SORT_BAM.out.bam
+    // //ch_genome_bam_index = SAMTOOLS_SORT_BAM.out.cai
 
-    ch_versions = ch_versions.mix(SAMTOOLS_SORT_BAM.out.versions)
+    // ch_versions = ch_versions.mix(SAMTOOLS_SORT_BAM.out.versions)
 
 
 
