@@ -21,8 +21,8 @@ process STAR_ALIGN {
     tuple val(meta), path('*Log.progress.out'), emit: log_progress
     path  "versions.yml"                      , emit: versions
 
-   // tuple val(meta), path('*d.out.bam')              , optional:true, emit: bam
-    tuple val(meta), path('*sortedByCoord.out.bam')  , optional:true, emit: bam //_sorted
+    tuple val(meta), path('*d.out.bam')              , optional:true, emit: bam
+    tuple val(meta), path('*sortedByCoord.out.bam')  , optional:true, emit: bam_sorted
     tuple val(meta), path('*toTranscriptome.out.bam'), optional:true, emit: bam_transcript
     tuple val(meta), path('*Aligned.unsort.out.bam') , optional:true, emit: bam_unsorted
     tuple val(meta), path('*fastq.gz')               , optional:true, emit: fastq
