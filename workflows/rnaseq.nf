@@ -144,6 +144,9 @@ include { QUANTIFY_SALMON as QUANTIFY_SALMON      } from '../subworkflows/local/
 include { CAT_FASTQ                   } from '../modules/nf-core/cat/fastq/main'
 include { BBMAP_BBSPLIT               } from '../modules/nf-core/bbmap/bbsplit/main'
 include { SAMTOOLS_SORT               } from '../modules/nf-core/samtools/sort/main'
+
+//!! we add this
+include { SAMTOOLS_SORT as   SAMTOOLS_SORT_BAM  } from '../modules/nf-core/samtools/sort/main'
 include { PRESEQ_LCEXTRAP             } from '../modules/nf-core/preseq/lcextrap/main'
 include { QUALIMAP_RNASEQ             } from '../modules/nf-core/qualimap/rnaseq/main'
 include { SORTMERNA                   } from '../modules/nf-core/sortmerna/main'
@@ -601,17 +604,35 @@ if (params.single_end_sample) {
         // to replace original bam            = ALIGN_STAR.out.bam
 
 
-        ch_genome_bam        = ALIGN_STAR.out.bam_sorted
+        ch_genome_bam        = ALIGN_STAR.out.bam
         ch_genome_bam_index  = ALIGN_STAR.out.bai
         ch_transcriptome_bam = ALIGN_STAR.out.bam_transcript
         ch_samtools_stats    = ALIGN_STAR.out.stats
         ch_samtools_flagstat = ALIGN_STAR.out.flagstat
         ch_samtools_idxstats = ALIGN_STAR.out.idxstats
         ch_star_multiqc      = ALIGN_STAR.out.log_final
+
+
+
+
         if (params.bam_csi_index) {
             ch_genome_bam_index = ALIGN_STAR.out.csi
         }
         ch_versions = ch_versions.mix(ALIGN_STAR.out.versions)
+
+        //since '--outSAMtype BAM SortedByCoordinate' in module always have error 109
+    // we use samtools to sort bam file
+    // in config file  bam_csi_index  = false with_umi = false
+
+
+
+    SAMTOOLS_SORT_BAM(ch_genome_bam)
+
+    ch_genome_bam        = SAMTOOLS_SORT_BAM.out.bam
+    //ch_genome_bam_index = SAMTOOLS_SORT_BAM.out.cai
+
+    ch_versions = ch_versions.mix(SAMTOOLS_SORT_BAM.out.versions)
+
 
 
 

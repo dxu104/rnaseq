@@ -11,7 +11,7 @@ process STAR_ALIGN {
         'quay.io/biocontainers/star:2.7.11a--h0033a41_0' }"
 
     input:
-    tuple val(meta), path(reads) //, stageAs: "input*/*"
+    tuple val(meta), path(reads, stageAs: "input*/*")
     path index
     path gtf
     val star_ignore_sjdbgtf
