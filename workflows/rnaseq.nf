@@ -1218,6 +1218,7 @@ To create the `StringTieMerge` branch on your remote server and synchronize it w
 4. **Switch to the `StringTieMerge` branch**. If this branch does not exist locally, you'll need to create and switch to it:
    ```
    git checkout -b StringTieMerge origin/StringTieMerge
+   git checkout -b  Bamsifter origin/Bamsifter
    ```
 
 By now, you should be on the `StringTieMerge` branch on your remote server, and it should be synchronized with the same branch in your GitHub repository.
@@ -1244,6 +1245,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //scp -r /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/* dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/launch_dir/
 
 //use -bg to run in the background https://www.nextflow.io/docs/latest/cli.html?highlight=bg
+// !!!this is the command to run the pipeline on local M1
 // nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/Bamsifter_smallest_AWSBatch -params-file ../launch_dir/zfTestAWSBatch/zf_params_AWSBatch.json
 
 //memverge
@@ -1274,4 +1276,5 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //command to verify after bamsifter bam file is sorted or not.
 //samtools view -H /Users/xudecheng/MDIBL/Nextflow_Training/training/nf-training/work/7f/72cc6dcb609daad458534d22045a3a/all_double_copy.reads.bam | grep 'SO:'
 //–outSAMtype: type of output. Default is BAM Unsorted; STAR outputs unsorted Aligned.out.bam file(s). “The paired ends of an alignment are always adjacent, and multiple alignments of a read are adjacent as well. This ”unsorted” file cannot be directly used with downstream software such as HTseq, without the need of name sorting.” We therefore prefer the option BAM SortedByCoordinate
+//sortmerna extremly slow even for 2mb test input
 
