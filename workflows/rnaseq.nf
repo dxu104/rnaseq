@@ -639,7 +639,8 @@ if (params.single_end_sample) {
 
 
        // SUBWORKFLOW: Remove duplicate reads from BAM file based on UMIs
-
+//  default with_umi = false
+/*
         if (params.with_umi) {
             // Deduplicate genome BAM file before downstream analysis
             BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME (
@@ -705,10 +706,10 @@ if (params.single_end_sample) {
                 .set { ch_transcriptome_bam }
                 ch_transcriptome_bam.view{ "Ready for bamsifter  Meta: ${it[0]}, Path: ${it[1]}" }
         }
-
+ */
 // BAMSIFTER normalizes the bam files in parallel.
 
-    ch_bamstifer=BAMSIFTER(ch_genome_bam ).normalized_bam.collect()
+    ch_bamstifer=BAMSIFTER(ch_genome_bam).normalized_bam.collect()
 
 // put all the bamsifter outputs into a single channel
     ch_bamstifer
@@ -744,8 +745,8 @@ if (params.single_end_sample) {
     //
 
     BAMSIFTER_NORMALIZATION_MERGED_BAM(SAMTOOLS_MERGE.out.merged_bam)
-    ch_genome_bam = BAMSIFTER_NORMALIZATION_MERGED_BAM.out.normalized_bam
-    ch_genome_bam.view()
+    BAMSIFTER_NORMALIZATION_MERGED_BAM.out.normalized_bam.set{ch_genome_bam}
+    ch_genome_bam.view{ "Ready for StringTie  Meta: ${it[0]}, Path: ${it[1]}" }
 
 
 
@@ -785,19 +786,10 @@ if (params.single_end_sample) {
 
 
 
-
-
-
-
-
-
-
-
-
     //
     // SUBWORKFLOW: Alignment with STAR and gene/transcript quantification with RSEM
-    //
-    ch_rsem_multiqc = Channel.empty()
+    // in nextflow config file aligner = stat_salmon
+  /*   ch_rsem_multiqc = Channel.empty()
     if (!params.skip_alignment && params.aligner == 'star_rsem') {
         QUANTIFY_RSEM (
             ch_filtered_reads,
@@ -827,7 +819,8 @@ if (params.single_end_sample) {
             ch_versions = ch_versions.mix(DESEQ2_QC_RSEM.out.versions)
         }
     }
-
+ */
+/*
     //
     // SUBWORKFLOW: Alignment with HISAT2
     //
@@ -850,10 +843,11 @@ if (params.single_end_sample) {
         }
         ch_versions = ch_versions.mix(FASTQ_ALIGN_HISAT2.out.versions)
 
-        //
+ */        //
         // SUBWORKFLOW: Remove duplicate reads from BAM file based on UMIs
-        //
-        if (params.with_umi) {
+        // default  with_umi  = fasle
+
+   /*      if (params.with_umi) {
             BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME (
                 ch_genome_bam.join(ch_genome_bam_index, by: [0]),
                 params.umitools_dedup_stats
@@ -868,6 +862,8 @@ if (params.single_end_sample) {
             }
             ch_versions = ch_versions.mix(BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.versions)
         }
+ */
+
     }
 
 
@@ -917,8 +913,9 @@ if (params.single_end_sample) {
 
     //
     // MODULE: Run Preseq
-    //
-    ch_preseq_multiqc = Channel.empty()
+    // skip_qc = false skip_preseq true
+
+   /*  ch_preseq_multiqc = Channel.empty()
     if (!params.skip_alignment && !params.skip_qc && !params.skip_preseq) {
         PRESEQ_LCEXTRAP (
             ch_genome_bam
@@ -926,7 +923,7 @@ if (params.single_end_sample) {
         ch_preseq_multiqc = PRESEQ_LCEXTRAP.out.lc_extrap
         ch_versions = ch_versions.mix(PRESEQ_LCEXTRAP.out.versions.first())
     }
-
+ */
     //
     // SUBWORKFLOW: Mark duplicate reads
     //
@@ -1318,7 +1315,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //tmux kill-session -t your session name
 //cat modules/local/TrinityNormalization/trinity_normalization.nf
 //command to verify after bamsifter bam file is sorted or not.
-//samtools view -H /Users/xudecheng/Downloads/RAP1_UNINDUCED_REP1.sorted.bam | grep 'SO:'
+//samtools view -H /Users/xudecheng/Downloads/all_double.reads1.bam | grep 'SO:'
 //–outSAMtype: type of output. Default is BAM Unsorted; STAR outputs unsorted Aligned.out.bam file(s). “The paired ends of an alignment are always adjacent, and multiple alignments of a read are adjacent as well. This ”unsorted” file cannot be directly used with downstream software such as HTseq, without the need of name sorting.” We therefore prefer the option BAM SortedByCoordinate
 //sortmerna extremly slow even for 2mb test input
-
+// Shift + option + A

@@ -38,8 +38,6 @@ workflow ALIGN_STAR {
         ch_log_final      = STAR_ALIGN_IGENOMES.out.log_final
         ch_log_out        = STAR_ALIGN_IGENOMES.out.log_out
         ch_log_progress   = STAR_ALIGN_IGENOMES.out.log_progress
-
-        // in here use this
         ch_bam_sorted     = STAR_ALIGN_IGENOMES.out.bam_sorted
         ch_bam_transcript = STAR_ALIGN_IGENOMES.out.bam_transcript
         ch_fastq          = STAR_ALIGN_IGENOMES.out.fastq
@@ -51,8 +49,6 @@ workflow ALIGN_STAR {
         ch_log_final      = STAR_ALIGN.out.log_final
         ch_log_out        = STAR_ALIGN.out.log_out
         ch_log_progress   = STAR_ALIGN.out.log_progress
-
-        // in here use this
         ch_bam_sorted     = STAR_ALIGN.out.bam_sorted
         ch_bam_transcript = STAR_ALIGN.out.bam_transcript
         ch_fastq          = STAR_ALIGN.out.fastq
@@ -76,9 +72,9 @@ workflow ALIGN_STAR {
     fastq          = ch_fastq                       // channel: [ val(meta), fastq          ]
     tab            = ch_tab                         // channel: [ val(meta), tab            ]
 
+    //！！！！Here Align already help us sort the bam 
+
     bam            = BAM_SORT_STATS_SAMTOOLS.out.bam      // channel: [ val(meta), [ bam ] ]
-
-
     bai            = BAM_SORT_STATS_SAMTOOLS.out.bai      // channel: [ val(meta), [ bai ] ]
     csi            = BAM_SORT_STATS_SAMTOOLS.out.csi      // channel: [ val(meta), [ csi ] ]
     stats          = BAM_SORT_STATS_SAMTOOLS.out.stats    // channel: [ val(meta), [ stats ] ]
