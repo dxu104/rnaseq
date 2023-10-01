@@ -783,6 +783,7 @@ if (params.single_end_sample) {
             ch_versions = ch_versions.mix(DESEQ2_QC_STAR_SALMON.out.versions)
         }
     }
+    //this purple barcket is for star_align
 
 
 
@@ -819,8 +820,8 @@ if (params.single_end_sample) {
             ch_versions = ch_versions.mix(DESEQ2_QC_RSEM.out.versions)
         }
     }
- */
-/*
+
+
     //
     // SUBWORKFLOW: Alignment with HISAT2
     //
@@ -843,11 +844,11 @@ if (params.single_end_sample) {
         }
         ch_versions = ch_versions.mix(FASTQ_ALIGN_HISAT2.out.versions)
 
- */        //
+        //
         // SUBWORKFLOW: Remove duplicate reads from BAM file based on UMIs
         // default  with_umi  = fasle
 
-   /*      if (params.with_umi) {
+        if (params.with_umi) {
             BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME (
                 ch_genome_bam.join(ch_genome_bam_index, by: [0]),
                 params.umitools_dedup_stats
@@ -862,7 +863,7 @@ if (params.single_end_sample) {
             }
             ch_versions = ch_versions.mix(BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.versions)
         }
- */
+
 
     }
 
@@ -924,6 +925,7 @@ if (params.single_end_sample) {
         ch_versions = ch_versions.mix(PRESEQ_LCEXTRAP.out.versions.first())
     }
  */
+
     //
     // SUBWORKFLOW: Mark duplicate reads
     //
@@ -1170,7 +1172,7 @@ if (params.single_end_sample) {
             ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'),
             ch_multiqc_logo.collect().ifEmpty([]),
             ch_fail_trimming_multiqc.collectFile(name: 'fail_trimmed_samples_mqc.tsv').ifEmpty([]),
-            ch_fail_mapping_multiqc.collectFile(name: 'fail_mapped_samples_mqc.tsv').ifEmpty([]),
+            //ch_fail_mapping_multiqc.collectFile(name: 'fail_mapped_samples_mqc.tsv').ifEmpty([]),
             ch_fail_strand_multiqc.collectFile(name: 'fail_strand_check_mqc.tsv').ifEmpty([]),
             ch_fastqc_raw_multiqc.collect{it[1]}.ifEmpty([]),
             ch_fastqc_trim_multiqc.collect{it[1]}.ifEmpty([]),
@@ -1204,7 +1206,9 @@ if (params.single_end_sample) {
         multiqc_report = MULTIQC.out.report.toList()
 
     }
+
 }
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
