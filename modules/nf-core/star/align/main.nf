@@ -1,3 +1,5 @@
+//* --outBAMsortingBinsN option to control the number of sorting bins. Increasing this number reduces the amount of RAM required for sorting.
+
 process STAR_ALIGN {
     tag "$meta.id"
     label 'process_high'
@@ -59,6 +61,8 @@ process STAR_ALIGN {
         $out_sam_type \\
         $ignore_gtf \\
         $attrRG \\
+        -outBAMsortingThreadN $task.cpus \\
+        --outBAMsortingBinsN 100   \\
         $args
 
     $mv_unsorted_bam
