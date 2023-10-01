@@ -1,14 +1,11 @@
-//* --outBAMsortingBinsN option to control the number of sorting bins. Increasing this number reduces the amount of RAM required for sorting.
-
 process STAR_ALIGN {
     tag "$meta.id"
     label 'process_high'
-    //preivous one is  'biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0'
-// quay.io/biocontainers/star is latest version from https://quay.io/repository/biocontainers/star?tab=tags
+
     conda "bioconda::star=2.7.10a bioconda::samtools=1.16.1 conda-forge::gawk=5.1.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0' :
-        'quay.io/biocontainers/star:2.7.11a--h0033a41_0' }"
+        'biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0' }"
 
     input:
     tuple val(meta), path(reads, stageAs: "input*/*")
@@ -23,10 +20,8 @@ process STAR_ALIGN {
     tuple val(meta), path('*Log.out')         , emit: log_out
     tuple val(meta), path('*Log.progress.out'), emit: log_progress
     path  "versions.yml"                      , emit: versions
-    
+
     tuple val(meta), path('*d.out.bam')              , optional:true, emit: bam
-    //you should use this STAR_ALIGN.out.bam_sorted for rnaseq/subworkflows/local/align_star.nf
-    // instead STAR_ALIGN.out.bam
     tuple val(meta), path('*sortedByCoord.out.bam')  , optional:true, emit: bam_sorted
     tuple val(meta), path('*toTranscriptome.out.bam'), optional:true, emit: bam_transcript
     tuple val(meta), path('*Aligned.unsort.out.bam') , optional:true, emit: bam_unsorted
@@ -62,8 +57,6 @@ process STAR_ALIGN {
         $out_sam_type \\
         $ignore_gtf \\
         $attrRG \\
-        -outBAMsortingThreadN $task.cpus \\
-        --outBAMsortingBinsN 100   \\
         $args
 
     $mv_unsorted_bam
