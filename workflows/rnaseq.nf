@@ -552,8 +552,24 @@ if (params.fastqc_after_trinity)
 
 
 
+if (params.double_end_sample) {
+
+ch_filtered_reads = ch_filtered_reads
+    .filter { meta, path ->
+        meta.single_end == false || meta.single_end == null  // null is for the case of undefined
+    }
 
 
+//In terms of Single end
+
+if (params.single_end_sample) {
+
+    ch_filtered_reads = ch_filtered_reads
+        .filter { meta, path ->
+            meta.single_end == true
+        }
+
+}
 
    // SUBWORKFLOW: Alignment with STAR and gene/transcript quantification with Salmon
 
@@ -580,8 +596,11 @@ if (params.fastqc_after_trinity)
         //please check subworkflow align_stat, you will found emit： bam            = BAM_SORT_STATS_SAMTOOLS.out.bam
         // and module/nf-core star/align/main.nf
 
+        //we use ch_genome_bam        = ALIGN_STAR.out.bam_sorted
+        // to replace original bam            = ALIGN_STAR.out.bam
 
-        ch_genome_bam        = ALIGN_STAR.out.bam
+
+        ch_genome_bam        = ALIGN_STAR.out.bam_sorted
         ch_genome_bam_index  = ALIGN_STAR.out.bai
         ch_transcriptome_bam = ALIGN_STAR.out.bam_transcript
         ch_samtools_stats    = ALIGN_STAR.out.stats
@@ -615,7 +634,9 @@ if (params.fastqc_after_trinity)
             }
             ch_versions = ch_versions.mix(BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.versions)
 
+
             // Co-ordinate sort, index and run stats on transcriptome BAM
+            // !! important! only sort the transcriptome bam file
             BAM_SORT_STATS_SAMTOOLS (
                 ch_transcriptome_bam,
                 PREPARE_GENOME.out.fasta.map { [ [:], it ] }
@@ -665,10 +686,10 @@ if (params.fastqc_after_trinity)
 
 // BAMSIFTER normalizes the bam files in parallel.
 
-    BAMSIFTER(ch_genome_bam )
+    ch_bamstifer=BAMSIFTER(ch_genome_bam ).normalized_bam.collect()
 
 // put all the bamsifter outputs into a single channel
-    BAMSIFTER.out.normalized_bam.collect()
+    ch_bamstifer
     .flatMap()
             .map {
                  item ->
@@ -701,8 +722,9 @@ if (params.fastqc_after_trinity)
     //
 
     BAMSIFTER_NORMALIZATION_MERGED_BAM(SAMTOOLS_MERGE.out.merged_bam)
-    ch_genome_bam=BAMSIFTER_NORMALIZATION_MERGED_BAM.out.normalized_bam
+    ch_genome_bam = BAMSIFTER_NORMALIZATION_MERGED_BAM.out.normalized_bam
     ch_genome_bam.view()
+
 
 
 
@@ -1274,7 +1296,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //tmux kill-session -t your session name
 //cat modules/local/TrinityNormalization/trinity_normalization.nf
 //command to verify after bamsifter bam file is sorted or not.
-//samtools view -H /Users/xudecheng/MDIBL/Nextflow_Training/training/nf-training/work/7f/72cc6dcb609daad458534d22045a3a/all_double_copy.reads.bam | grep 'SO:'
+//samtools view -H /Users/xudecheng/Downloads/RAP1_UNINDUCED_REP1.sorted.bam | grep 'SO:'
 //–outSAMtype: type of output. Default is BAM Unsorted; STAR outputs unsorted Aligned.out.bam file(s). “The paired ends of an alignment are always adjacent, and multiple alignments of a read are adjacent as well. This ”unsorted” file cannot be directly used with downstream software such as HTseq, without the need of name sorting.” We therefore prefer the option BAM SortedByCoordinate
 //sortmerna extremly slow even for 2mb test input
 

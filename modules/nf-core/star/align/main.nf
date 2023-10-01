@@ -22,6 +22,8 @@ process STAR_ALIGN {
     path  "versions.yml"                      , emit: versions
 
     tuple val(meta), path('*d.out.bam')              , optional:true, emit: bam
+    //you should use this STAR_ALIGN.out.bam_sorted for rnaseq/subworkflows/local/align_star.nf
+    // instead STAR_ALIGN.out.bam
     tuple val(meta), path('*sortedByCoord.out.bam')  , optional:true, emit: bam_sorted
     tuple val(meta), path('*toTranscriptome.out.bam'), optional:true, emit: bam_transcript
     tuple val(meta), path('*Aligned.unsort.out.bam') , optional:true, emit: bam_unsorted

@@ -11,7 +11,7 @@ workflow ALIGN_STAR {
     reads               // channel: [ val(meta), [ reads ] ]
     index               // channel: /path/to/star/index/
     gtf                 // channel: /path/to/genome.gtf
-    star_ignore_sjdbgtf // boolean: when using pre-built STAR indices do not re-extract and use splice junctions from the GTF file 
+    star_ignore_sjdbgtf // boolean: when using pre-built STAR indices do not re-extract and use splice junctions from the GTF file
     seq_platform        // string : sequencing platform
     seq_center          // string : sequencing center
     is_aws_igenome      // boolean: whether the genome files are from AWS iGenomes
@@ -38,6 +38,8 @@ workflow ALIGN_STAR {
         ch_log_final      = STAR_ALIGN_IGENOMES.out.log_final
         ch_log_out        = STAR_ALIGN_IGENOMES.out.log_out
         ch_log_progress   = STAR_ALIGN_IGENOMES.out.log_progress
+
+        // in here use this
         ch_bam_sorted     = STAR_ALIGN_IGENOMES.out.bam_sorted
         ch_bam_transcript = STAR_ALIGN_IGENOMES.out.bam_transcript
         ch_fastq          = STAR_ALIGN_IGENOMES.out.fastq
@@ -49,6 +51,8 @@ workflow ALIGN_STAR {
         ch_log_final      = STAR_ALIGN.out.log_final
         ch_log_out        = STAR_ALIGN.out.log_out
         ch_log_progress   = STAR_ALIGN.out.log_progress
+
+        // in here use this
         ch_bam_sorted     = STAR_ALIGN.out.bam_sorted
         ch_bam_transcript = STAR_ALIGN.out.bam_transcript
         ch_fastq          = STAR_ALIGN.out.fastq
@@ -73,6 +77,8 @@ workflow ALIGN_STAR {
     tab            = ch_tab                         // channel: [ val(meta), tab            ]
 
     bam            = BAM_SORT_STATS_SAMTOOLS.out.bam      // channel: [ val(meta), [ bam ] ]
+
+
     bai            = BAM_SORT_STATS_SAMTOOLS.out.bai      // channel: [ val(meta), [ bai ] ]
     csi            = BAM_SORT_STATS_SAMTOOLS.out.csi      // channel: [ val(meta), [ csi ] ]
     stats          = BAM_SORT_STATS_SAMTOOLS.out.stats    // channel: [ val(meta), [ stats ] ]
