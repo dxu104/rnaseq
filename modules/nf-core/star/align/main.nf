@@ -3,11 +3,12 @@
 process STAR_ALIGN {
     tag "$meta.id"
     label 'process_high'
+    //preivous one is  'biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0'
 // quay.io/biocontainers/star is latest version from https://quay.io/repository/biocontainers/star?tab=tags
     conda "bioconda::star=2.7.10a bioconda::samtools=1.16.1 conda-forge::gawk=5.1.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0' :
-        'quay.io/biocontainers/star@sha256:91530a1e0a30d859645f075fbdb4bf73e2a92c3e2b890e154dfbee4b3f3356a4' }"
+        'quay.io/biocontainers/star:2.7.11a--h0033a41_0' }"
 
     input:
     tuple val(meta), path(reads, stageAs: "input*/*")
