@@ -737,18 +737,18 @@ if (params.single_end_sample) {
         //Forturnately, we have the bam files sorted in the previous step
         //and after we normalize the bam files, those normalized bam files are also sorted.
 
-    SAMTOOLS_MERGE
-    (ch_bamstifer_ready_samtools_merged,
+
+    SAMTOOLS_MERGE(ch_bamstifer_ready_samtools_merged,
             PREPARE_GENOME.out.fasta.map { [ [:], it ] },
             PREPARE_GENOME.out.fai.map { [ [:], it ] }
         )
      ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions.first())
 
-    SAMTOOLS_MERGE.out.merged_bam.view()
+    SAMTOOLS_MERGE.out.bam.view()
 
     //
 
-    BAMSIFTER_NORMALIZATION_MERGED_BAM(SAMTOOLS_MERGE.out.merged_bam)
+    BAMSIFTER_NORMALIZATION_MERGED_BAM(SAMTOOLS_MERGE.out.bam)
     BAMSIFTER_NORMALIZATION_MERGED_BAM.out.normalized_bam.set{ch_genome_bam}
     ch_genome_bam.view{ "Ready for StringTie  Meta: ${it[0]}, Path: ${it[1]}" }
 
@@ -1268,6 +1268,7 @@ To create the `StringTieMerge` branch on your remote server and synchronize it w
    ```
    git checkout -b StringTieMerge origin/StringTieMerge
    git checkout -b  Bamsifter origin/Bamsifter
+   git checkout -b  Bamsifter_Merge origin/Bamsifter_Merge
    ```
 
 By now, you should be on the `StringTieMerge` branch on your remote server, and it should be synchronized with the same branch in your GitHub repository.
