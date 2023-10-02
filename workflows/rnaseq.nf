@@ -737,7 +737,11 @@ if (params.single_end_sample) {
         //Forturnately, we have the bam files sorted in the previous step
         //and after we normalize the bam files, those normalized bam files are also sorted.
 
-    SAMTOOLS_MERGE(ch_bamstifer_ready_samtools_merged)
+    SAMTOOLS_MERGE
+    (ch_bamstifer_ready_samtools_merged,
+            PREPARE_GENOME.out.fasta.map { [ [:], it ] },
+            PREPARE_GENOME.out.fai.map { [ [:], it ] }
+        )
      ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions.first())
 
     SAMTOOLS_MERGE.out.merged_bam.view()
