@@ -1,6 +1,6 @@
 process BAMSIFTER {
     tag "$meta.id"
-    label 'process_high'
+    label 'process_bamsifter'
 
 
     container "docker.io/trinityctat/ctat_vif"
