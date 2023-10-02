@@ -962,7 +962,7 @@ if (params.single_end_sample) {
 
     //we add this
     // MODULE: STRINGTIE_MERGE
-    //
+    //The module output: tuple val(meta), path("*.transcripts.gtf"), emit: transcript_gtf
     if (!params.skip_alignment && !params.skip_stringtie) {
         //modify the STRINGTIE_STRINGTIE output format to align the STRINGTIE_MERGE input format
         ch_stringtie_gtf_only = STRINGTIE_STRINGTIE.out.transcript_gtf.map { meta, gtf -> return gtf }
