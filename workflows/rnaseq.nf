@@ -1292,11 +1292,15 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/zfTest/ /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/
 
 //move the input file and json from local to the random
+
+//scp -r /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq
+
 //scp -r /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/* dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/launch_dir/
 
 //use -bg to run in the background https://www.nextflow.io/docs/latest/cli.html?highlight=bg
-// !!!this is the command to run the pipeline on local M1
-// nextflow run main.nf -profile test,docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/Bamsifter_smallest_AWSBatch -params-file ../launch_dir/zfTestAWSBatch/zf_params_AWSBatch.json
+
+// !!!this is the command to run the pipeline on local M1 no memverge
+// nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/Bamsifter_why_merge_so_slow_AWSBatch_no_MemVerge -params-file ../launch_dir/zfTestAWSBatch/zf_params_AWSBatch.json
 
 //memverge
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemverge/float.config -with-tower  -params-file ../launch_dir/zfTestMemverge/zf_params_memverge.json  -resume -bg
