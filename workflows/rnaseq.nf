@@ -1130,7 +1130,7 @@ if (params.single_end_sample) {
     //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
         QUANTIFY_SALMON (
             ch_filtered_reads,
-            PREPARE_GENOME.out.salmon_index,
+            PREPARE_GENOME.out.≈,
             ch_dummy_file,
             STRINGTIE_MERGE.out.gtf,
             false,
@@ -1328,7 +1328,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //tmux kill-session -t your session name
 //cat modules/local/TrinityNormalization/trinity_normalization.nf
 //command to verify after bamsifter bam file is sorted or not.
-//samtools view -H /Users/xudecheng/Downloads/all_double.reads1.bam | grep 'SO:'
+//samtools view -H /Users/dxu/SL139783.mergedAll.bam | grep 'SO:'
 //–outSAMtype: type of output. Default is BAM Unsorted; STAR outputs unsorted Aligned.out.bam file(s). “The paired ends of an alignment are always adjacent, and multiple alignments of a read are adjacent as well. This ”unsorted” file cannot be directly used with downstream software such as HTseq, without the need of name sorting.” We therefore prefer the option BAM SortedByCoordinate
 //sortmerna extremly slow even for 2mb test input
 // Shift + option + A
