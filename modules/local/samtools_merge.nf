@@ -7,8 +7,10 @@ process SAMTOOLS_MERGE {
         'https://depot.galaxyproject.org/singularity/samtools:1.17--h00cdaf9_0' :
         'biocontainers/samtools:1.17--h00cdaf9_0' }"
 
+        //, stageAs: "?/*"
+
     input:
-    tuple val(meta), path(input_files, stageAs: "?/*")
+    tuple val(meta), path(input_files)
     tuple val(meta2), path(fasta)
     tuple val(meta3), path(fai)
 

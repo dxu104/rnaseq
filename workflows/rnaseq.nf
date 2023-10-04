@@ -1295,6 +1295,12 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //scp -r /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq
 
+//copy s3 to random do not work we need download from s3 to local and then upload to random
+// aws s3 cp s3://biocore-data/external/ensembl/release-109/danio_rerio.genome.fa /Users/dxu/MDI/RNAseq_TrinityNormalization/testMergetool
+// scp -r /Users/dxu/MDI/RNAseq_TrinityNormalization/testMergetool/danio_rerio.genome.fa dxu@random.mdibl.org:/compbio/scratch/dxu/testMergetool
+
+// scp -r /Users/dxu/MDI/RNAseq_TrinityNormalization/testMergetool dxu@random.mdibl.org:/compbio/scratch/dxu/testMergetool
+
 //scp -r /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/* dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/launch_dir/
 
 //use -bg to run in the background https://www.nextflow.io/docs/latest/cli.html?highlight=bg
@@ -1323,8 +1329,9 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq_copy
 // cd /compbio/scratch/dxu/newrnaseq/rnaseq_smallest_test_delete_read_by_set
-//tmux attach -t
+//tmux attach -t or tmux a -t
 //tmux new -s your session name
+//tmux rename-session -t preivousname new_name
 //tmux kill-session -t your session name
 //cat modules/local/TrinityNormalization/trinity_normalization.nf
 //command to verify after bamsifter bam file is sorted or not.
@@ -1332,3 +1339,6 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //–outSAMtype: type of output. Default is BAM Unsorted; STAR outputs unsorted Aligned.out.bam file(s). “The paired ends of an alignment are always adjacent, and multiple alignments of a read are adjacent as well. This ”unsorted” file cannot be directly used with downstream software such as HTseq, without the need of name sorting.” We therefore prefer the option BAM SortedByCoordinate
 //sortmerna extremly slow even for 2mb test input
 // Shift + option + A
+//cd /compbio/scratch/dxu/testMergetool
+//samtools merge  SL* -f -o all.bam --threads 15 --reference danio_rerio.genome.fa
+//samtools view all.bam | parallel -j 32 --pipe wc -l | awk '{s+=$1} END {print s}'
