@@ -114,6 +114,9 @@ include { SAMTOOLS_MERGE } from '../modules/local/samtools_merge.nf'
 // include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL_DoubleEnd} from '../modules/local/trinity.nf'
 // include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL_SingleEnd} from '../modules/local/trinity.nf'
 
+include { RSEM_PREPAREREFERENCE as MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF      } from '../modules/nf-core/rsem/preparereference/main'
+include { GTF_GENE_FILTER as   GTF_GENE_FILTER_FROM_NEW_GTF                    } from '../modules/local/gtf_gene_filter'
+
 //fastq after trinity normalization
 include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
 
@@ -784,6 +787,23 @@ if (params.single_end_sample) {
     }
 
 
+    // update ch_transcriptome_bam, below code from prepare_genome, I just change  MAKE_TRANSCRIPTS_FASTA name and GTF_GENE_FILTER name
+
+ /*     previous code like:
+    else {
+        ch_filter_gtf = GTF_GENE_FILTER ( ch_fasta, ch_gtf ).gtf
+        ch_transcript_fasta = MAKE_TRANSCRIPTS_FASTA ( ch_fasta, ch_filter_gtf ).transcript_fasta
+        ch_versions         = ch_versions.mix(GTF_GENE_FILTER.out.versions)
+        ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA.out.versions)
+    } */
+
+
+    ch_filter_gtf = GTF_GENE_FILTER_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, STRINGTIE_MERGE.out.gtf ).gtf
+        ch_transcript_fasta = MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, ch_filter_gtf ).transcript_fasta
+        ch_versions         = ch_versions.mix(GTF_GENE_FILTER_FROM_NEW_GTF.out.versions)
+        ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF.out.versions)
+
+
 
 
 
@@ -798,11 +818,12 @@ if (params.single_end_sample) {
 
         //
         // SUBWORKFLOW: Count reads from BAM alignments using Salmon
-        //
+        // update previous PREPARE_GENOME.out.transcript_fasta, with new ch_transcript_fasta
+        // update previous PREPARE_GENOME.out.gtf with new STRINGTIE_MERGE.out.gtf
         QUANTIFY_STAR_SALMON (
             ch_transcriptome_bam,
             ch_dummy_file,
-            PREPARE_GENOME.out.transcript_fasta,
+            ch_transcript_fasta,
             STRINGTIE_MERGE.out.gtf,
             true,
             params.salmon_quant_libtype ?: ''
