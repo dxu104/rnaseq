@@ -757,6 +757,39 @@ if (params.single_end_sample) {
 
 
 
+    //
+    // MODULE: STRINGTIE_STRINGTIE
+    //
+    if (!params.skip_alignment && !params.skip_stringtie) {
+        STRINGTIE_STRINGTIE (
+            ch_genome_bam,
+            PREPARE_GENOME.out.gtf
+        )
+        ch_versions = ch_versions.mix(STRINGTIE_STRINGTIE.out.versions.first())
+    }
+
+
+    //we add this
+    // MODULE: STRINGTIE_MERGE
+    //The module output: tuple val(meta), path("*.transcripts.gtf"), emit: transcript_gtf
+    if (!params.skip_alignment && !params.skip_stringtie) {
+        //modify the STRINGTIE_STRINGTIE output format to align the STRINGTIE_MERGE input format
+        ch_stringtie_gtf_only = STRINGTIE_STRINGTIE.out.transcript_gtf.map { meta, gtf -> return gtf }
+
+        STRINGTIE_MERGE (
+            ch_stringtie_gtf_only,
+            PREPARE_GENOME.out.gtf
+        )
+        ch_versions = ch_versions.mix(STRINGTIE_MERGE.out.versions.first())
+    }
+
+
+
+
+
+
+
+
 
 
 
@@ -770,7 +803,7 @@ if (params.single_end_sample) {
             ch_transcriptome_bam,
             ch_dummy_file,
             PREPARE_GENOME.out.transcript_fasta,
-            PREPARE_GENOME.out.gtf,
+            STRINGTIE_MERGE.out.gtf,
             true,
             params.salmon_quant_libtype ?: ''
         )
@@ -952,31 +985,10 @@ if (params.single_end_sample) {
         ch_versions = ch_versions.mix(BAM_MARKDUPLICATES_PICARD.out.versions)
     }
 
-    //
-    // MODULE: STRINGTIE_STRINGTIE
-    //
-    if (!params.skip_alignment && !params.skip_stringtie) {
-        STRINGTIE_STRINGTIE (
-            ch_genome_bam,
-            PREPARE_GENOME.out.gtf
-        )
-        ch_versions = ch_versions.mix(STRINGTIE_STRINGTIE.out.versions.first())
-    }
 
 
-    //we add this
-    // MODULE: STRINGTIE_MERGE
-    //The module output: tuple val(meta), path("*.transcripts.gtf"), emit: transcript_gtf
-    if (!params.skip_alignment && !params.skip_stringtie) {
-        //modify the STRINGTIE_STRINGTIE output format to align the STRINGTIE_MERGE input format
-        ch_stringtie_gtf_only = STRINGTIE_STRINGTIE.out.transcript_gtf.map { meta, gtf -> return gtf }
 
-        STRINGTIE_MERGE (
-            ch_stringtie_gtf_only,
-            PREPARE_GENOME.out.gtf
-        )
-        ch_versions = ch_versions.mix(STRINGTIE_MERGE.out.versions.first())
-    }
+
 
     //
     // MODULE: Feature biotype QC using featureCounts
