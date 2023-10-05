@@ -114,8 +114,8 @@ include { SAMTOOLS_MERGE } from '../modules/local/samtools_merge.nf'
 // include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL_DoubleEnd} from '../modules/local/trinity.nf'
 // include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL_SingleEnd} from '../modules/local/trinity.nf'
 
-include { RSEM_PREPAREREFERENCE as MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF      } from '../modules/nf-core/rsem/preparereference/main'
-include { GTF_GENE_FILTER as   GTF_GENE_FILTER_FROM_NEW_GTF                    } from '../modules/local/gtf_gene_filter'
+// include { RSEM_PREPAREREFERENCE as MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF   } from '../modules/nf-core/rsem/preparereference/main.nf'
+// include { GTF_GENE_FILTER   as   GTF_GENE_FILTER_FROM_NEW_GTF         } from '../modules/local/gtf_gene_filter.nf'
 
 //fastq after trinity normalization
 include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
@@ -798,10 +798,10 @@ if (params.single_end_sample) {
     } */
 
 
-    ch_filter_gtf = GTF_GENE_FILTER_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, STRINGTIE_MERGE.out.gtf ).gtf
-        ch_transcript_fasta = MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, ch_filter_gtf ).transcript_fasta
-        ch_versions         = ch_versions.mix(GTF_GENE_FILTER_FROM_NEW_GTF.out.versions)
-        ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF.out.versions)
+    // ch_filter_gtf = GTF_GENE_FILTER_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, STRINGTIE_MERGE.out.gtf ).gtf
+    //     ch_transcript_fasta = MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, ch_filter_gtf ).transcript_fasta
+    //     ch_versions         = ch_versions.mix(GTF_GENE_FILTER_FROM_NEW_GTF.out.versions)
+    //     ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF.out.versions)
 
 
 
@@ -823,7 +823,7 @@ if (params.single_end_sample) {
         QUANTIFY_STAR_SALMON (
             ch_transcriptome_bam,
             ch_dummy_file,
-            ch_transcript_fasta,
+            PREPARE_GENOME.out.transcript_fasta,
             STRINGTIE_MERGE.out.gtf,
             true,
             params.salmon_quant_libtype ?: ''
