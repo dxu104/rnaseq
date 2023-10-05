@@ -820,10 +820,77 @@ if (params.single_end_sample) {
         // SUBWORKFLOW: Count reads from BAM alignments using Salmon
         // update previous PREPARE_GENOME.out.transcript_fasta, with new ch_transcript_fasta
         // update previous PREPARE_GENOME.out.gtf with new STRINGTIE_MERGE.out.gtf
+        //when you use ch_transcript_fasta, will have error SAM file says target ENSDART00000152259 has length 934, but the FASTA file contains a sequence of length [1772 or 1771]
+        // I calcualte  ENSDART00000152259  length in origin Danio_rerio.GRCz11.109.gtf file, the  length is 934
+        /*
+
+        Exon 1 Length=59147540−59147385+1=156
+Exon 2 Length
+=
+59148361
+−
+59148231
++
+1
+=
+131
+Exon 2 Length=59148361−59148231+1=131
+Exon 3 Length
+=
+59148500
+−
+59148457
++
+1
+=
+44
+Exon 3 Length=59148500−59148457+1=44
+Exon 4 Length
+=
+59148808
+−
+59148759
++
+1
+=
+50
+Exon 4 Length=59148808−59148759+1=50
+Exon 5 Length
+=
+59148970
+−
+59148887
++
+1
+=
+84
+Exon 5 Length=59148970−59148887+1=84
+Exon 6 Length
+=
+59149173
+−
+59149052
++
+1
+=
+122
+Exon 6 Length=59149173−59149052+1=122
+Exon 7 Length
+=
+59150220
+−
+59149874
++
+1
+=
+347
+Exon 7 Length=59150220−59149874+1=347
+         */
+
         QUANTIFY_STAR_SALMON (
             ch_transcriptome_bam,
             ch_dummy_file,
-            ch_transcript_fasta,
+            PREPARE_GENOME.out.transcript_fast
             STRINGTIE_MERGE.out.gtf,
             true,
             params.salmon_quant_libtype ?: ''
@@ -1323,7 +1390,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //move the input file and json to the local laptop
 //scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/zfTest/ /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/
-
+//  scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/workdir  /Users/dxu/whymerge_soslow/OnRamdon_output_workdir_cop_fromRandom
 //move the input file and json from local to the random
 
 //scp -r /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq
