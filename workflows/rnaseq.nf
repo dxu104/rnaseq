@@ -890,7 +890,7 @@ Exon 7 Length=59150220−59149874+1=347
         QUANTIFY_STAR_SALMON (
             ch_transcriptome_bam,
             ch_dummy_file,
-            PREPARE_GENOME.out.transcript_fast
+            PREPARE_GENOME.out.transcript_fast,
             STRINGTIE_MERGE.out.gtf,
             true,
             params.salmon_quant_libtype ?: ''
