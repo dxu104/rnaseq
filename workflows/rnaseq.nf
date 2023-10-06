@@ -116,6 +116,7 @@ include { SAMTOOLS_MERGE } from '../modules/local/samtools_merge.nf'
 
 include { RSEM_PREPAREREFERENCE as MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF      } from '../modules/nf-core/rsem/preparereference/main'
 include { GTF_GENE_FILTER   as   GTF_GENE_FILTER_FROM_NEW_GTF                    } from '../modules/local/gtf_gene_filter.nf'
+include { SALMON_INDEX   as   SALMON_INDEX_FROM_NEW_TRANSCRIPT_FASTA                 } from '../modules/nf-core/salmon/index/main'
 
 //fastq after trinity normalization
 include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
@@ -803,6 +804,14 @@ if (params.single_end_sample) {
         ch_versions         = ch_versions.mix(GTF_GENE_FILTER_FROM_NEW_GTF.out.versions)
         ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF.out.versions)
 
+      ch_new_salmon_index =  SALMON_INDEX_FROM_NEW_TRANSCRIPT_FASTA (
+
+            PREPARE_GENOME.out.fasta,
+             ch_transcript_fasta
+        ).index
+
+         ch_versions         = ch_versions.mix(SALMON_INDEX_FROM_NEW_TRANSCRIPT_FASTA.out.versions)
+
 
 
 
@@ -887,12 +896,25 @@ Exon 7 Length
 Exon 7 Length=59150220−59149874+1=347
          */
 
+         //when official pipeline use ch_dummy_file, the ch_dummy_file is empty, they just set PREPARE_GENOME.out.salmon_index  empty
+
         QUANTIFY_STAR_SALMON (
-            ch_transcriptome_bam,
+            // ch_transcriptome_bam,
+            // ch_dummy_file,
+            // PREPARE_GENOME.out.transcript_fasta,
+            // STRINGTIE_MERGE.out.gtf,
+            // true,
+            // params.salmon_quant_libtype ?: ''
+
+
+      // instead using bam as input we use raw fastq, since bam from old gtf.
+      //we also need to update PREPARE_GENOME.out.salmon_index with ch_new_salmon_index  using ch_transcript_fasta
+
+            ch_filtered_reads,
+            ch_new_salmon_index,
             ch_dummy_file,
-            PREPARE_GENOME.out.transcript_fasta,
             STRINGTIE_MERGE.out.gtf,
-            true,
+            false,
             params.salmon_quant_libtype ?: ''
         )
         ch_versions = ch_versions.mix(QUANTIFY_STAR_SALMON.out.versions)
@@ -1228,6 +1250,7 @@ Exon 7 Length=59150220−59149874+1=347
     if (!params.skip_pseudo_alignment && params.pseudo_aligner == 'salmon') {
                    //update our  genome reference gtf file after applying STRINGTIE_MERGE module
     //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
+    //when official pipeline use ch_dummy_file, the ch_dummy_file is empty, they just set transcript_fasta empty
         QUANTIFY_SALMON (
             ch_filtered_reads,
             PREPARE_GENOME.out.salmon_index,
@@ -1393,7 +1416,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //  scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/workdir  /Users/dxu/whymerge_soslow/OnRamdon_output_workdir_cop_fromRandom
 //move the input file and json from local to the random
 
-//scp -r /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq
+//scp -r /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/nextflow.AWSBatch.config dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/TestUnkownerroor
 
 //copy s3 to random do not work we need download from s3 to local and then upload to random
 // aws s3 cp s3://biocore-data/external/ensembl/release-109/danio_rerio.genome.fa /Users/dxu/MDI/RNAseq_TrinityNormalization/testMergetool
@@ -1405,8 +1428,9 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //use -bg to run in the background https://www.nextflow.io/docs/latest/cli.html?highlight=bg
 
-// !!!this is the command to run the pipeline on local M1 no memverge
+// !!!this is the command to run the pipeline on AWSBATCH no memverge
 // nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/Bamsifter_why_merge_so_slow_AWSBatch_no_MemVerge -params-file ../launch_dir/zfTestAWSBatch/zf_params_AWSBatch.json
+
 //on mac local
  //nextflow run main.nf -profile docker   -work-dir /Users/dxu/whymerge_soslow/localworkdir -params-file ../launch_dir/zfTestlocal/zf_paramslocal.json
 
@@ -1420,7 +1444,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/zfTestMemvergeOndemand/zf_params_memvergeOndemand.json -resume
 
 //memverge ondeman smallest test file
-//nextflow run main.nf -profile test,docker -c ../launch_dir/smallestTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/smallestTestMemvergeOndemand/zf_params_memvergeOndemand.json  -resume
+//
 
 
 //memverge ondeman two samples delete transmit without normalization by read set
