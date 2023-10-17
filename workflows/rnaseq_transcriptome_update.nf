@@ -187,7 +187,7 @@ def pass_mapped_reads  = [:]
 def pass_trimmed_reads = [:]
 def pass_strand_check  = [:]
 
-workflow RNASEQ {
+workflow RNASEQ_TRANSCRIPTOME_UPDATE {
 
     ch_versions = Channel.empty()
 
@@ -1451,7 +1451,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 // !!!this is the command to run the pipeline on AWSBATCH no memverge
 // nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/Bamsifter_why_merge_so_slow_AWSBatch_no_MemVerge -params-file ../launch_dir/zfTestAWSBatch/zf_params_AWSBatch.json
 
-//on mac local
+//on local mac
  //nextflow run main.nf -profile docker   -work-dir /Users/dxu/whymerge_soslow/localworkdir -params-file ../launch_dir/zfTestlocal/zf_paramslocal.json
 
 //on random

@@ -43,13 +43,13 @@ WorkflowMain.initialise(workflow, params, log)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RNASEQ } from './workflows/rnaseq'
+include { RNASEQ_TRANSCRIPTOME_UPDATE} from './workflows/rnaseq_transcriptome_update.nf'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
 //
-workflow NFCORE_RNASEQ {
-    RNASEQ ()
+workflow NFCORE_RNASEQ_TRANSCRIPTOME_UPDATE {
+    RNASEQ_TRANSCRIPTOME_UPDATE ()
 }
 
 /*
@@ -63,7 +63,7 @@ workflow NFCORE_RNASEQ {
 // See: https://github.com/nf-core/rnaseq/issues/619
 //
 workflow {
-    NFCORE_RNASEQ ()
+    NFCORE_RNASEQ_TRANSCRIPTOME_UPDATE ()
 }
 
 /*
