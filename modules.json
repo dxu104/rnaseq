@@ -1,5 +1,5 @@
 {
-    "name": "nf-core/rnaseq",
+    "name": "nf-core/rnaseq_transcriptome_update",
     "homePage": "https://github.com/nf-core/rnaseq",
     "repos": {
         "https://github.com/nf-core/modules.git": {
