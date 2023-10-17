@@ -773,6 +773,20 @@ if (params.single_end_sample) {
         ch_versions = ch_versions.mix(STRINGTIE_STRINGTIE.out.versions.first())
     }
 
+    //
+    // MODULE: GFFCOMPARE
+    //
+
+    // 将fasta和fai合并为一个通道，并确保格式为 tuple val(meta2), path(fasta), path(fai)
+ch_combine_fasta_fai = PREPARE_GENOME.out.fasta.combine(PREPARE_GENOME.out.fai)
+                          .map { fasta, fai -> [ [:], fasta, fai ] }
+    // 将reference_gtf格式化为 tuple val(meta3), path(reference_gtf)
+ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
+
+    GFFCOMPARE(STRINGTIE_STRINGTIE.out.transcript_gtf,ch_combine_fasta_fai,ch_reference_gtf)
+
+
+
 
     //we add this
     // MODULE: STRINGTIE_MERGE
