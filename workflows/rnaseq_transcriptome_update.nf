@@ -117,6 +117,7 @@ include { SAMTOOLS_MERGE } from '../modules/local/samtools_merge.nf'
 include { RSEM_PREPAREREFERENCE as MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF      } from '../modules/nf-core/rsem/preparereference/main'
 include { GTF_GENE_FILTER   as   GTF_GENE_FILTER_FROM_NEW_GTF                    } from '../modules/local/gtf_gene_filter.nf'
 include { SALMON_INDEX   as   SALMON_INDEX_FROM_NEW_TRANSCRIPT_FASTA                 } from '../modules/nf-core/salmon/index/main'
+include { GFFCOMPARE                   } from '../modules/local/gffcompare.nf'
 
 //fastq after trinity normalization
 include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
@@ -919,7 +920,7 @@ Exon 7 Length=59150220−59149874+1=347
         )
         ch_versions = ch_versions.mix(QUANTIFY_STAR_SALMON.out.versions)
 
-        if (!params.skip_qc & !params.skip_deseq2_qc) {
+        /* if (!params.skip_qc & !params.skip_deseq2_qc) {
             DESEQ2_QC_STAR_SALMON (
                 QUANTIFY_STAR_SALMON.out.counts_gene_length_scaled,
                 ch_pca_header_multiqc,
@@ -928,7 +929,7 @@ Exon 7 Length=59150220−59149874+1=347
             ch_aligner_pca_multiqc        = DESEQ2_QC_STAR_SALMON.out.pca_multiqc
             ch_aligner_clustering_multiqc = DESEQ2_QC_STAR_SALMON.out.dists_multiqc
             ch_versions = ch_versions.mix(DESEQ2_QC_STAR_SALMON.out.versions)
-        }
+        } */
     }
     //this purple barcket is for star_align
 
@@ -1251,7 +1252,8 @@ Exon 7 Length=59150220−59149874+1=347
                    //update our  genome reference gtf file after applying STRINGTIE_MERGE module
     //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
     //when official pipeline use ch_dummy_file, the ch_dummy_file is empty, they just set transcript_fasta empty
-        QUANTIFY_SALMON (
+
+       /*  QUANTIFY_SALMON (
             ch_filtered_reads,
             PREPARE_GENOME.out.salmon_index,
             ch_dummy_file,
@@ -1271,7 +1273,7 @@ Exon 7 Length=59150220−59149874+1=347
             ch_pseudoaligner_pca_multiqc        = DESEQ2_QC_SALMON.out.pca_multiqc
             ch_pseudoaligner_clustering_multiqc = DESEQ2_QC_SALMON.out.dists_multiqc
             ch_versions = ch_versions.mix(DESEQ2_QC_SALMON.out.versions)
-        }
+        } */
     }
 
     //
@@ -1380,6 +1382,9 @@ To create the `StringTieMerge` branch on your remote server and synchronize it w
    This should display the URL of your GitHub repository. If it doesn't, you'll need to add it:
    ```
    git remote add origin YOUR_GITHUB_REPO_URL
+
+   use this to update your url
+   git remote set-url origin https://github.com/dxu104/rnaseq_transcriptome_update.git
    ```
 
 3. **Fetch all updates from GitHub for all branches**:
@@ -1392,6 +1397,7 @@ To create the `StringTieMerge` branch on your remote server and synchronize it w
    git checkout -b StringTieMerge origin/StringTieMerge
    git checkout -b  Bamsifter origin/Bamsifter
    git checkout -b  Bamsifter_Merge origin/Bamsifter_Merge
+    git checkout -b update_transcript_fasta origin/update_transcript_fasta
    ```
 
 By now, you should be on the `StringTieMerge` branch on your remote server, and it should be synchronized with the same branch in your GitHub repository.
@@ -1413,7 +1419,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //move the input file and json to the local laptop
 //scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/zfTest/ /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/
-//  scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/workdir  /Users/dxu/whymerge_soslow/OnRamdon_output_workdir_cop_fromRandom
+//  scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/workdir/11/  /Users/dxu/whymerge_soslow/OnRamdon_output_workdir_cop_fromRandom
 //move the input file and json from local to the random
 
 //scp -r /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/nextflow.AWSBatch.config dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/TestUnkownerroor
@@ -1444,7 +1450,8 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/zfTestMemvergeOndemand/zf_params_memvergeOndemand.json -resume
 
 //memverge ondeman smallest test file
-//
+// nextflow run main.nf -profile test,docker -c ../launch_dir/smallestTestMemvergeOndemand/float_ondemand.config -with-tower  -params-file ../launch_dir/smallestTestMemvergeOndemand/zf_params_memvergeOndemand.json  -resume
+
 
 
 //memverge ondeman two samples delete transmit without normalization by read set
@@ -1471,3 +1478,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //cd /compbio/scratch/dxu/testMergetool
 //samtools merge  SL* -f -o all.bam --threads 15 --reference danio_rerio.genome.fa
 //samtools view all.bam | parallel -j 32 --pipe wc -l | awk '{s+=$1} END {print s}'
+
+// cat ~/.ssh/id_rsa.pub
+// eval "$(ssh-agent -s)"
+// ssh-add ~/.ssh/id_rsa
