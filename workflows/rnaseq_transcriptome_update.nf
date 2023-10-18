@@ -777,13 +777,15 @@ if (params.single_end_sample) {
     // MODULE: GFFCOMPARE
     //
 
-    // 将fasta和fai合并为一个通道，并确保格式为 tuple val(meta2), path(fasta), path(fai)
+    // combine fasta and fai into one channel，make sure format is tuple val(meta2), path(fasta), path(fai)
 ch_combine_fasta_fai = PREPARE_GENOME.out.fasta.combine(PREPARE_GENOME.out.fai)
                           .map { fasta, fai -> [ [:], fasta, fai ] }
-    // 将reference_gtf格式化为 tuple val(meta3), path(reference_gtf)
+    // convert reference_gtf int a format tuple val(meta3), path(reference_gtf)
 ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
 
     GFFCOMPARE(STRINGTIE_STRINGTIE.out.transcript_gtf,ch_combine_fasta_fai,ch_reference_gtf)
+
+    ch_versions = ch_versions.mix(GFFCOMPARE.out.versions.first())
 
 
 
