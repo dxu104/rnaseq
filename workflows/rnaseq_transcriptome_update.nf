@@ -1436,6 +1436,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //move the input file and json to the local laptop
 //scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/zfTest/ /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/
 //  scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/workdir/11/  /Users/dxu/whymerge_soslow/OnRamdon_output_workdir_cop_fromRandom
+// scp  dxu@random.mdibl.org:/home/dxu/jfs_ssh.key  /Users/dxu/
 //move the input file and json from local to the random
 
 //scp -r /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/nextflow.AWSBatch.config dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/TestUnkownerroor
@@ -1454,6 +1455,9 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 // nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/Bamsifter_why_merge_so_slow_AWSBatch_no_MemVerge -params-file ../launch_dir/zfTestAWSBatch/zf_params_AWSBatch.json
 // nextflow run nf-core/fetchngs -profile docker test_full -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/TestWhyBatchNotWork -work-dir s3://mdibl-nextflow-work/dxu/TestWhyBatchNotWork  -with-tower
 //
+//Axolotl
+// nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/axolotl2samples_10-30-23_BatchIOPS -params-file ../launch_dir/axolotl2samples/parameter.json
+
 //on local mac
  //nextflow run main.nf -profile docker   -work-dir /Users/dxu/whymerge_soslow/localworkdir -params-file ../launch_dir/zfTestlocal/zf_paramslocal.json
 
@@ -1473,6 +1477,8 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //memverge ondeman two samples delete transmit without normalization by read set
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemverge2samples/float.config -with-tower  -params-file ../launch_dir/zfTestMemverge2samples/zf_params_memverge.json -resume
+
+//nextflow run main.nf -profile docker -c ../mmcloud.config  -params-file ../zf_params_memverge.json -with-tower -resume
 
 //memverge ondeman two samples delete transmit and with normalization by read set
 //nextflow run main.nf -profile docker -c ../launch_dir/zfTestMemverge2samplesnormalize_by_read_set/float.config -with-tower  -params-file ../launch_dir/zfTestMemverge2samplesnormalize_by_read_set/zf_params_memverge.json
