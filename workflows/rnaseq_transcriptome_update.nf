@@ -1456,8 +1456,8 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 // nextflow run nf-core/fetchngs -profile docker test_full -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/TestWhyBatchNotWork -work-dir s3://mdibl-nextflow-work/dxu/TestWhyBatchNotWork  -with-tower
 //
 //Axolotl
-// nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/axolotl2samples_10-30-23_BatchIOPS -params-file ../launch_dir/axolotl2samples/parameter.json
-
+// 
+// nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/axolotl2samples_10-30-23_BatchIOPS -params-file ../launch_dir/axolotl2samples/parameter.json --bam_csi_index -resume
 //on local mac
  //nextflow run main.nf -profile docker   -work-dir /Users/dxu/whymerge_soslow/localworkdir -params-file ../launch_dir/zfTestlocal/zf_paramslocal.json
 
