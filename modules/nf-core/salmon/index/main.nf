@@ -1,6 +1,6 @@
 process SALMON_INDEX {
     tag "$transcript_fasta"
-    label "process_medium"
+    label "process_salmon_index"
 
     conda "bioconda::salmon=1.10.1"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

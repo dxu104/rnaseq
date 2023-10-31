@@ -9,6 +9,7 @@ process GFFREAD {
 
     input:
     path gff
+    path reference_gtf
 
     output:
     path "*.gtf"        , emit: gtf
