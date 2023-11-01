@@ -1414,6 +1414,7 @@ To create the `StringTieMerge` branch on your remote server and synchronize it w
    git checkout -b  Bamsifter origin/Bamsifter
    git checkout -b  Bamsifter_Merge origin/Bamsifter_Merge
     git checkout -b update_transcript_fasta origin/update_transcript_fasta
+    git checkout -b axolotltest origin/axolotltest
    ```
 
 By now, you should be on the `StringTieMerge` branch on your remote server, and it should be synchronized with the same branch in your GitHub repository.
@@ -1456,7 +1457,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 // nextflow run nf-core/fetchngs -profile docker test_full -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/TestWhyBatchNotWork -work-dir s3://mdibl-nextflow-work/dxu/TestWhyBatchNotWork  -with-tower
 //
 //Axolotl
-// 
+//
 // nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/axolotl2samples_10-30-23_BatchIOPS -params-file ../launch_dir/axolotl2samples/parameter.json --bam_csi_index -resume
 //on local mac
  //nextflow run main.nf -profile docker   -work-dir /Users/dxu/whymerge_soslow/localworkdir -params-file ../launch_dir/zfTestlocal/zf_paramslocal.json
