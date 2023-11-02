@@ -1452,13 +1452,37 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //use -bg to run in the background https://www.nextflow.io/docs/latest/cli.html?highlight=bg
 
+
+//copy file from random to aws s3 bucket
+
+//aws s3 cp /compbio/reference/axolotl-omics/AmexG_v6_chr_unscaffolded.fa s3://biocore-data/JamesGodwin/jgodwin_001/axolotlGTFAndFasta/
+//aws s3 cp /compbio/reference/axolotl-omics/AmexT_v47.chr.unscaffolded.CherryGFP.gtf s3://biocore-data/JamesGodwin/jgodwin_001/axolotlGTFAndFasta/
+
+
+
+//Runner HeadNode
+
+// scp -i /Users/dxu/jfs_admin_multiuser_ssh.key dxu@52.55.106.191:/mnt/jfs/nextflow/dxu/mmcloud.config.template /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir/axolotl2samples/
+
+//copy config and json file from local mac to runner headnode
+//scp -i /Users/dxu/jfs_admin_multiuser_ssh.key -r /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir root@ec2-52-55-106-191.compute-1.amazonaws.com:/mnt/jfs/nextflow/dxu
+
 // !!!this is the command to run the pipeline on AWSBATCH no memverge
 // nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/Bamsifter_why_merge_so_slow_AWSBatch_no_MemVerge -params-file ../launch_dir/zfTestAWSBatch/zf_params_AWSBatch.json
 // nextflow run nf-core/fetchngs -profile docker test_full -c nextflow.AWSBatch.config --outdir s3://mdibl-dxu/TestWhyBatchNotWork -work-dir s3://mdibl-nextflow-work/dxu/TestWhyBatchNotWork  -with-tower
 //
-//Axolotl
+//Axolotl aws batch ondemand
+
 //
-// nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/axolotl2samples_10-30-23_BatchIOPS -params-file ../launch_dir/axolotl2samples/parameter.json --bam_csi_index -resume
+// nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/axolotl2samples_10-30-23_BatchIOPS -params-file ../launch_dir/axolotl2samples/parameter.json -resume
+
+// axolotl mutliuse jfs memverge
+//ssh -i /Users/dxu/jfs_admin_multiuser_ssh.key dxu@52.55.106.191
+//  cd rnaseq_transcriptome_update
+//tmux new -s your session name
+
+//nextflow run main.nf -profile docker -c ../launch_dir/axolotl2samples/mmcloud.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
+
 //on local mac
  //nextflow run main.nf -profile docker   -work-dir /Users/dxu/whymerge_soslow/localworkdir -params-file ../launch_dir/zfTestlocal/zf_paramslocal.json
 
