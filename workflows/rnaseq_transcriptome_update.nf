@@ -1482,6 +1482,8 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //tmux new -s your session name
 
 //nextflow run main.nf -profile docker -c ../launch_dir/axolotl2samples/mmcloud.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
+//OnDemand
+//nextflow run main.nf -profile docker -c ../launch_dir/axolotl2samples/mmcloud_OnDemand.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
 
 //on local mac
  //nextflow run main.nf -profile docker   -work-dir /Users/dxu/whymerge_soslow/localworkdir -params-file ../launch_dir/zfTestlocal/zf_paramslocal.json
