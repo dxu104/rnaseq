@@ -1461,10 +1461,12 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 
 //Runner HeadNode
+//copy file from HeadNode to local mac
 
 // scp -i /Users/dxu/jfs_admin_multiuser_ssh.key dxu@52.55.106.191:/mnt/jfs/nextflow/dxu/mmcloud.config.template /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir/axolotl2samples/
 
-//copy config and json file from local mac to runner headnode
+// scp -i /Users/dxu/jfs_admin_multiuser_ssh.key dxu@52.55.106.191:/mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/ec/664b1b514bdc19e0114cbc64aac702 /Users/dxu/Documents/axolotStringTieMergeSuccess/outPutformFisrtSalmon_Index
+// scp -i /Users/dxu/jfs_admin_multiuser_ssh.key dxu@52.55.106.191:/mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/35/1c49e8* /Users/dxu/Documents/axolotStringTieMergeSuccess/resultsFromGffcompare/
 //scp -i /Users/dxu/jfs_admin_multiuser_ssh.key -r /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir root@ec2-52-55-106-191.compute-1.amazonaws.com:/mnt/jfs/nextflow/dxu
 
 // !!!this is the command to run the pipeline on AWSBATCH no memverge
