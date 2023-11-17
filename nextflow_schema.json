@@ -751,15 +751,15 @@
     ],
     "properties": {
         "single_end_sample": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "double_end_sample": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "fastqc_after_trinity": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "gene_prefix": {
@@ -767,19 +767,19 @@
             "default": "AM-MIDBLv00001"
         },
         "trinity_normalization_by_read_set": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "skip_bamsifter": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "skip_samtools_merge": {
-            "type": "string",
+            "type": "boolean",
             "default": "false"
         },
         "stringtie_merge": {
-            "type": "string",
+            "type": "boolean",
             "default": "true"
         },
         "schema_ignore_params": {
