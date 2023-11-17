@@ -1439,7 +1439,8 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //  scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/workdir/11/  /Users/dxu/whymerge_soslow/OnRamdon_output_workdir_cop_fromRandom
 // scp  dxu@random.mdibl.org:/home/dxu/jfs_ssh.key  /Users/dxu/
 //move the input file and json from local to the random
-
+//aws s3 cp /compbio/analysis/JamesGodwin/jgodwin_001.nf_core_genome/star_salmon/stringtie/3A.coverage.gtf s3://biocore-data/JamesGodwin/jgodwin_001/gtfFile/
+ //scp -r dxu@random.mdibl.org:/compbio/analysis/JamesGodwin/jgodwin_001.nf_core_genome/star_salmon/stringtie/3A.transcripts.gtf s3://biocore-data/JamesGodwin/jgodwin_001/gtfFile/
 //scp -r /Users/dxu/MDI/RNAseq_TrinityNormalization/rnaseq/nextflow.AWSBatch.config dxu@random.mdibl.org:/compbio/scratch/dxu/newrnaseq/TestUnkownerroor
 
 //copy s3 to random do not work we need download from s3 to local and then upload to random
@@ -1462,6 +1463,14 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //Runner HeadNode
 //copy file from HeadNode to local mac
+
+
+//Copy file from headnode to S3
+//This is original salmon_Index from REPARE_GENOME:SALMON_INDEX:  aws s3 sync /mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/9e/24ca52b68c1a08e40844f98ce7e3d4/salmon s3://biocore-data/JamesGodwin/jgodwin_001/AxolotlSalmonIndexFromREPARE_GENOME_SALMON_INDEX/
+
+//  This is new salmon_Index after stringTie Merge:  aws s3 sync /mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/50/305d14ec4744f205ef1af91d49a1c7/salmon  s3://biocore-data/JamesGodwin/jgodwin_001/AxolotlSalmonIdex/
+
+//  This is StarIndex:  aws s3 sync /mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/2c/2af926e34ca767e3b97a61747dfb39/star s3://biocore-data/JamesGodwin/jgodwin_001/AxolotlStarIndex/
 
 // scp -i /Users/dxu/jfs_admin_multiuser_ssh.key dxu@52.55.106.191:/mnt/jfs/nextflow/dxu/mmcloud.config.template /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir/axolotl2samples/
 
@@ -1486,6 +1495,11 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //nextflow run main.nf -profile docker -c ../launch_dir/axolotl2samples/mmcloud.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
 //OnDemand
 //nextflow run main.nf -profile docker -c ../launch_dir/axolotl2samples/mmcloud_OnDemand.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
+
+//partialOnDemand
+//nextflow run main.nf -profile docker -c ../launch_dir/axolotl2samples/mmcloud_PartialOnDemand.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
+
+
 
 //on local mac
  //nextflow run main.nf -profile docker   -work-dir /Users/dxu/whymerge_soslow/localworkdir -params-file ../launch_dir/zfTestlocal/zf_paramslocal.json

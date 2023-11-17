@@ -748,5 +748,43 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "single_end_sample": {
+            "type": "string",
+            "default": "false"
+        },
+        "double_end_sample": {
+            "type": "string",
+            "default": "false"
+        },
+        "fastqc_after_trinity": {
+            "type": "string",
+            "default": "false"
+        },
+        "gene_prefix": {
+            "type": "string",
+            "default": "AM-MIDBLv00001"
+        },
+        "trinity_normalization_by_read_set": {
+            "type": "string",
+            "default": "false"
+        },
+        "skip_bamsifter": {
+            "type": "string",
+            "default": "false"
+        },
+        "skip_samtools_merge": {
+            "type": "string",
+            "default": "false"
+        },
+        "stringtie_merge": {
+            "type": "string",
+            "default": "true"
+        },
+        "schema_ignore_params": {
+            "type": "string",
+            "default": "genomes"
+        }
+    }
 }
