@@ -1,6 +1,4 @@
 process SORTMERNA {
-    publishDir "sortmerna_outputs", mode: 'copy', pattern: "*"
-
     tag "$meta.id"
     label "process_high"
 
@@ -39,11 +37,6 @@ process SORTMERNA {
         mv non_rRNA_reads.f*q.gz ${prefix}.non_rRNA.fastq.gz
         mv rRNA_reads.log ${prefix}.sortmerna.log
 
-        # Echo the paths
-        echo "Generated files:"
-        echo "\$(pwd)/${prefix}.non_rRNA.fastq.gz"
-        echo "\$(pwd)/${prefix}.sortmerna.log"
-
         cat <<-END_VERSIONS > versions.yml
         "${task.process}":
             sortmerna: \$(echo \$(sortmerna --version 2>&1) | sed 's/^.*SortMeRNA version //; s/ Build Date.*\$//')
@@ -68,12 +61,6 @@ process SORTMERNA {
         mv non_rRNA_reads_rev.f*q.gz ${prefix}_2.non_rRNA.fastq.gz
         mv rRNA_reads.log ${prefix}.sortmerna.log
 
-        # Echo the paths
-        echo "Generated files:"
-        echo "\$(pwd)/${prefix}_1.non_rRNA.fastq.gz"
-        echo "\$(pwd)/${prefix}_2.non_rRNA.fastq.gz"
-        echo "\$(pwd)/${prefix}.sortmerna.log"
-
         cat <<-END_VERSIONS > versions.yml
         "${task.process}":
             sortmerna: \$(echo \$(sortmerna --version 2>&1) | sed 's/^.*SortMeRNA version //; s/ Build Date.*\$//')
@@ -81,7 +68,3 @@ process SORTMERNA {
         """
     }
 }
-
-
-
-
