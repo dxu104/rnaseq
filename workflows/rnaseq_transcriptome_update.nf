@@ -1415,6 +1415,7 @@ To create the `StringTieMerge` branch on your remote server and synchronize it w
    git checkout -b  Bamsifter_Merge origin/Bamsifter_Merge
     git checkout -b update_transcript_fasta origin/update_transcript_fasta
     git checkout -b axolotltest origin/axolotltest
+    git checkout -b axolotl_test_module_update origin/axolotl_test_module_update
    ```
 
 By now, you should be on the `StringTieMerge` branch on your remote server, and it should be synchronized with the same branch in your GitHub repository.
@@ -1498,7 +1499,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //nextflow run main.nf -profile docker -c ../launch_dir/axolotl2samples/mmcloud_OnDemand.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
 
 //partialOnDemand
-//nextflow run main.nf -profile docker -c ../launch_dir/axolotl2samples/mmcloud_PartialOnDemand.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
+//nextflow run main.nf  -c ../launch_dir/axolotl2samples/mmcloud_PartialOnDemand.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
 
 
 
