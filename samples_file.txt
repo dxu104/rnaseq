@@ -1,2 +1,0 @@
-SL94881	SL94881_reverse	SL94881_1_val_1.fq.gz	null
-SL94881	SL94881_reverse	SL94881_2_val_2.fq.gz	null

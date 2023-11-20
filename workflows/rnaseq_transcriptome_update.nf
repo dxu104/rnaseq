@@ -120,7 +120,7 @@ include { SALMON_INDEX   as   SALMON_INDEX_FROM_NEW_TRANSCRIPT_FASTA            
 include { GFFCOMPARE                   } from '../modules/local/gffcompare.nf'
 
 //fastq after trinity normalization
-include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
+//include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
 
 //StringTie merge modules
 include {STRINGTIE_MERGE} from '../modules/local/stringTie_merge/main.nf'
@@ -1433,6 +1433,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //ps -u dxu
 //kill -9  1234
 
+// /compbio/referece/axolotl-omics/AmexT_v47.chr.unscaffolded.CherryGFP.gtf
 
 //move the input file and json to the local laptop
 //scp -r dxu@random.mdibl.org:/compbio/scratch/dxu/zfTest/ /Users/xudecheng/Library/Mobile\ Documents/com~apple~CloudDocs/MDIBL/RNAseq_TrinityNormalization/launch_dir/

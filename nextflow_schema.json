@@ -44,6 +44,22 @@
                     "type": "boolean",
                     "fa_icon": "fas fa-save",
                     "description": "Save FastQ files after merging re-sequenced libraries in the results directory."
+                },
+                "single_end_sample": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Set this parameter to true if samples are Single-End Sequencing."
+                },
+                "double_end_sample": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Set this parameter to true if samples are Paired-End Sequencing."
+                },
+
+                "gene_prefix": {
+                    "type": "string",
+                    "default": "AM-MIDBLv00001",
+                    "description": "So for example, lets say, we decide to prefix all gene names with AM-MDIBL.  Then after stringtie –merge was run for the first time against the original reference gtf.  Given what I just said, our gene and transcript names for the updated merged gtf would become AM-MDIBLv00001.  The standard convention is that systematic gene IDs are consecutive on the genome, so starting with Chromosome 1, we would have AM-MIDBLv00001_000001, which means gene number 1 in version #1.  The isoforms of this gene would be AM-MIDBLv00001_000001.001, AM-MIDBLv00001_000001.002, and so on.  (This presumes no gene will ever have more than 1000 isoforms.). As you can see I have zero padded the counters in the naming, in order that they remain sortable in a meaningful way. So, to implement this we would need a program that modifies the output merged GTF, replacing all of the stringtie generated MSTRG names with what I defined above- it would also take in the current prefix and increment the version number, so that after the next RNAseq data set, we would have AM-MDIBLv00002, and so on."
                 }
             }
         },
@@ -460,6 +476,22 @@
             "fa_icon": "fas fa-fast-forward",
             "description": "Options to skip various steps within the workflow.",
             "properties": {
+                "skip_bamsifter": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Skip the BAMsifter step if true."
+
+                },
+                "skip_samtools_merge": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Skip the samtools merge step if true."
+                },
+                "stringtie_merge": {
+                    "type": "boolean",
+                    "default": "true",
+                    "description": "including the stringtie merge step"
+                },
                 "rseqc_modules": {
                     "type": "string",
                     "default": "bam_stat,inner_distance,infer_experiment,junction_annotation,junction_saturation,read_distribution,read_duplication",
@@ -750,38 +782,7 @@
         }
     ],
     "properties": {
-        "single_end_sample": {
-            "type": "boolean",
-            "default": "false"
-        },
-        "double_end_sample": {
-            "type": "boolean",
-            "default": "false"
-        },
-        "fastqc_after_trinity": {
-            "type": "boolean",
-            "default": "false"
-        },
-        "gene_prefix": {
-            "type": "string",
-            "default": "AM-MIDBLv00001"
-        },
-        "trinity_normalization_by_read_set": {
-            "type": "boolean",
-            "default": "false"
-        },
-        "skip_bamsifter": {
-            "type": "boolean",
-            "default": "false"
-        },
-        "skip_samtools_merge": {
-            "type": "boolean",
-            "default": "false"
-        },
-        "stringtie_merge": {
-            "type": "boolean",
-            "default": "true"
-        },
+
         "schema_ignore_params": {
             "type": "string",
             "default": "genomes"
