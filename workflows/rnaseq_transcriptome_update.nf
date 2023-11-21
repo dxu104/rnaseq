@@ -1198,7 +1198,7 @@ Exon 7 Length=59150220−59149874+1=347
     //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
             QUALIMAP_RNASEQ (
                 ch_genome_bam,
-                STRINGTIE_MERGE.out.gtf
+                STRINGTIE_MERGE.out.gtf.map { [ [:], it ] }
             )
             ch_qualimap_multiqc = QUALIMAP_RNASEQ.out.results
             ch_versions = ch_versions.mix(QUALIMAP_RNASEQ.out.versions.first())
