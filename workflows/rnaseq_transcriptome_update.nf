@@ -593,9 +593,8 @@ if (params.single_end_sample) {
     if (!params.skip_alignment && params.aligner == 'star_salmon') {
         ALIGN_STAR (
             ch_filtered_reads,
-            //how we  get PREPARE_GENOME.out.star_index? --subworkflows/local/prepare_genome.nf
-            PREPARE_GENOME.out.star_index,
-            PREPARE_GENOME.out.gtf,
+            PREPARE_GENOME.out.star_index.map { [ [:], it ] },
+            PREPARE_GENOME.out.gtf.map { [ [:], it ] },
             params.star_ignore_sjdbgtf,
             '',
             params.seq_center ?: '',
@@ -1496,7 +1495,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //nextflow run main.nf -profile docker -c ../launch_dir/axolotl2samples/mmcloud.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
 //OnDemand
-//nextflow run main.nf -profile docker -c ../launch_dir/axolotl2samples/mmcloud_OnDemand.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
+//nextflow run main.nf -c ../launch_dir/axolotl2samples/mmcloud_OnDemand.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
 
 //partialOnDemand
 //nextflow run main.nf  -c ../launch_dir/axolotl2samples/mmcloud_PartialOnDemand.config  -params-file ../launch_dir/axolotl2samples/parameter.json -with-tower -resume
