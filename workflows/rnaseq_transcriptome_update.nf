@@ -1472,7 +1472,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //  This is new salmon_Index after stringTie Merge:  aws s3 sync /mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/50/305d14ec4744f205ef1af91d49a1c7/salmon  s3://biocore-data/JamesGodwin/jgodwin_001/AxolotlSalmonIdex/
 
 //  This is StarIndex:  aws s3 sync /mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/2c/2af926e34ca767e3b97a61747dfb39/star s3://biocore-data/JamesGodwin/jgodwin_001/AxolotlStarIndex/
-
+// sync error aws s3 sync /mnt/jfs/nextflow/dxu/axolotl2samples_Nov20th2023_NoEoption_StringTie/50/893aef581150fb0833478268f65b13 s3://biocore-data/JamesGodwin/jgodwin_001/Error/StrandneitherPlus_Minues/
 // scp -i /Users/dxu/jfs_admin_multiuser_ssh.key dxu@52.55.106.191:/mnt/jfs/nextflow/dxu/mmcloud.config.template /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir/axolotl2samples/
 
 // scp -i /Users/dxu/jfs_admin_multiuser_ssh.key dxu@52.55.106.191:/mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/ec/664b1b514bdc19e0114cbc64aac702 /Users/dxu/Documents/axolotStringTieMergeSuccess/outPutformFisrtSalmon_Index
