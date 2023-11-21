@@ -2,15 +2,15 @@
 // Alignment with STAR
 //
 
-include { STAR_ALIGN          } from '../../modules/nf-core/star/align/main'
-include { STAR_ALIGN_IGENOMES } from '../../modules/local/star_align_igenomes'
-include { BAM_SORT_STATS_SAMTOOLS } from '../nf-core/bam_sort_stats_samtools/main'
+include { STAR_ALIGN              } from '../../../modules/nf-core/star/align'
+include { STAR_ALIGN_IGENOMES     } from '../../../modules/local/star_align_igenomes'
+include { BAM_SORT_STATS_SAMTOOLS } from '../../nf-core/bam_sort_stats_samtools'
 
 workflow ALIGN_STAR {
     take:
     reads               // channel: [ val(meta), [ reads ] ]
-    index               // channel: /path/to/star/index/
-    gtf                 // channel: /path/to/genome.gtf
+    index               // channel: [ val(meta), [ index ] ]
+    gtf                 // channel: [ val(meta), [ gtf ] ]
     star_ignore_sjdbgtf // boolean: when using pre-built STAR indices do not re-extract and use splice junctions from the GTF file
     seq_platform        // string : sequencing platform
     seq_center          // string : sequencing center
@@ -71,8 +71,6 @@ workflow ALIGN_STAR {
     bam_transcript = ch_bam_transcript              // channel: [ val(meta), bam_transcript ]
     fastq          = ch_fastq                       // channel: [ val(meta), fastq          ]
     tab            = ch_tab                         // channel: [ val(meta), tab            ]
-
-    //！！！！Here Align already help us sort the bam 
 
     bam            = BAM_SORT_STATS_SAMTOOLS.out.bam      // channel: [ val(meta), [ bam ] ]
     bai            = BAM_SORT_STATS_SAMTOOLS.out.bai      // channel: [ val(meta), [ bai ] ]
