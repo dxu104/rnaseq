@@ -773,6 +773,13 @@ if (params.single_end_sample) {
         )
         ch_versions = ch_versions.mix(STRINGTIE_STRINGTIE.out.versions.first())
     }
+    //
+    // Module: ASSIGN_STRAND_AFTER_STRINGTIE
+    //
+    if(params.stringtie_ignore_gtf){
+    ASSIGN_STRAND_AFTER_STRINGTIE(STRINGTIE_STRINGTIE.out.transcript_gtf)}
+
+
 
     //
     // MODULE: GFFCOMPARE
@@ -783,8 +790,8 @@ ch_combine_fasta_fai = PREPARE_GENOME.out.fasta.combine(PREPARE_GENOME.out.fai)
                           .map { fasta, fai -> [ [:], fasta, fai ] }
     // convert reference_gtf int a format  tuple val(meta3), path(reference_gtf)
 ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
-
-    GFFCOMPARE(STRINGTIE_STRINGTIE.out.transcript_gtf,ch_combine_fasta_fai,ch_reference_gtf)
+// 21th Nov: STRINGTIE_STRINGTIE.out.transcript_gtf will be changed to  ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf (which is a gtf file of deleting unspeficified standness of the stringtie output gtf file without -e option )
+    GFFCOMPARE(ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf,ch_combine_fasta_fai,ch_reference_gtf)
 
     ch_versions = ch_versions.mix(GFFCOMPARE.out.versions.first())
 
@@ -796,7 +803,10 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
     //The module output: tuple val(meta), path("*.transcripts.gtf"), emit: transcript_gtf
     if (!params.skip_alignment && !params.skip_stringtie) {
         //modify the STRINGTIE_STRINGTIE output format to align the STRINGTIE_MERGE input format
-        ch_stringtie_gtf_only = STRINGTIE_STRINGTIE.out.transcript_gtf.map { meta, gtf -> return gtf }
+
+// 21th Nov: STRINGTIE_STRINGTIE.out.transcript_gtf will be changed to  ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf (which is a gtf file of deleting unspeficified standness of the stringtie output gtf file without -e option )
+
+        ch_stringtie_gtf_only = ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf.map { meta, gtf -> return gtf }
 
         STRINGTIE_MERGE (
             ch_stringtie_gtf_only,
