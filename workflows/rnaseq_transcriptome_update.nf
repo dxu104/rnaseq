@@ -111,6 +111,8 @@ include { UMITOOLS_PREPAREFORRSEM as UMITOOLS_PREPAREFORSALMON } from '../module
 include { BAMSIFTER  } from '../modules/local/bamsifter.nf'
 include { BAMSIFTER as BAMSIFTER_NORMALIZATION_MERGED_BAM} from '../modules/local/bamsifter.nf'
 include { SAMTOOLS_MERGE } from '../modules/local/samtools_merge.nf'
+include { ASSIGN_STRAND_AFTER_STRINGTIE  } from '../modules/local/assignstrandafterstringtie.nf'
+
 // include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL_DoubleEnd} from '../modules/local/trinity.nf'
 // include { TRINITY_NORMALIZATION as TRINITY_NORMALIZATION_PARALLEL_SingleEnd} from '../modules/local/trinity.nf'
 
