@@ -712,51 +712,90 @@ if (params.single_end_sample) {
                 .set { ch_transcriptome_bam }
                 ch_transcriptome_bam.view{ "Ready for bamsifter  Meta: ${it[0]}, Path: ${it[1]}" }
         }
- */
-// BAMSIFTER normalizes the bam files in parallel.
+//  */
+// // BAMSIFTER normalizes the bam files in parallel.
+//     if(!params.skip_bamsifter){
 
-    ch_bamstifer=BAMSIFTER(ch_genome_bam).normalized_bam.collect()
+//     ch_bamstifer=BAMSIFTER(ch_genome_bam).normalized_bam.collect()
 
-// put all the bamsifter outputs into a single channel
+// // put all the bamsifter outputs into a single channel
+//     ch_bamstifer
+//     .flatMap()
+//             .map {
+//                  item ->
+//             if(item instanceof Map) {
+//             item['id'] = 'all_double'
+//             return item
+//             } else {
+//             return item
+//             }
+//             }
+//             .collate(2)
+//             .groupTuple()
+//             .map {
+//             meta, fastq ->
+//             [ meta, fastq.flatten() ]
+//             }
+//             .set{ch_bamstifer_ready_samtools_merged}
+//             ch_bamstifer_ready_samtools_merged.view{ "Ready for Samtools_Merge  Meta: ${it[0]}, Path: ${it[1]}" }}
+
+//         // Merge all the bam files using samtools merge
+//         //before merging, we need to sort the bam files
+//         //Forturnately, we have the bam files sorted in the previous step
+//         //and after we normalize the bam files, those normalized bam files are also sorted.
+
+
+//     SAMTOOLS_MERGE(ch_bamstifer_ready_samtools_merged,
+//             PREPARE_GENOME.out.fasta.map { [ [:], it ] },
+//             PREPARE_GENOME.out.fai.map { [ [:], it ] }
+//         )
+//      ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions.first())
+
+if(!params.skip_bamsifter) {
+    ch_bamstifer = BAMSIFTER(ch_genome_bam).normalized_bam.collect()
+
     ch_bamstifer
-    .flatMap()
-            .map {
-                 item ->
+        .flatMap()
+        .map { item ->
             if(item instanceof Map) {
-            item['id'] = 'all_double'
-            return item
+                item['id'] = 'all_double'
+                return item
             } else {
-            return item
+                return item
             }
-            }
-            .collate(2)
-            .groupTuple()
-            .map {
-            meta, fastq ->
+        }
+        .collate(2)
+        .groupTuple()
+        .map { meta, fastq ->
             [ meta, fastq.flatten() ]
-            }
-            .set{ch_bamstifer_ready_samtools_merged}
-            ch_bamstifer_ready_samtools_merged.view{ "Ready for Samtools_Merge  Meta: ${it[0]}, Path: ${it[1]}" }
+        }
+        .set{ ch_bamstifer_ready_samtools_merged }
+        ch_bamstifer_ready_samtools_merged.view{ "Ready for Samtools_Merge  Meta: ${it[0]}, Path: ${it[1]}" }
 
-        // Merge all the bam files using samtools merge
-        //before merging, we need to sort the bam files
-        //Forturnately, we have the bam files sorted in the previous step
-        //and after we normalize the bam files, those normalized bam files are also sorted.
-
-
+    // use BAMSIFTER to normalize the bam files in parallel.
     SAMTOOLS_MERGE(ch_bamstifer_ready_samtools_merged,
-            PREPARE_GENOME.out.fasta.map { [ [:], it ] },
-            PREPARE_GENOME.out.fai.map { [ [:], it ] }
-        )
-     ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions.first())
+        PREPARE_GENOME.out.fasta.map { [ [:], it ] },
+        PREPARE_GENOME.out.fai.map { [ [:], it ] }
+    )
+} else {
+    // IF skip BAMSIFTER，use CH_GENOME_BAM chanel
+    SAMTOOLS_MERGE(ch_genome_bam,
+        PREPARE_GENOME.out.fasta.map { [ [:], it ] },
+        PREPARE_GENOME.out.fai.map { [ [:], it ] }
+    )
+}
+ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions.first())
+
+
 
     SAMTOOLS_MERGE.out.bam.view()
 
-    //
+    //BAMSIFTER_NORMALIZATION_MERGED_BAM agin after SAMTOOLS_MERGE
 
+    if(!params.skip_bamsifter) {
     BAMSIFTER_NORMALIZATION_MERGED_BAM(SAMTOOLS_MERGE.out.bam)
     BAMSIFTER_NORMALIZATION_MERGED_BAM.out.normalized_bam.set{ch_genome_bam}
-    ch_genome_bam.view{ "Ready for StringTie  Meta: ${it[0]}, Path: ${it[1]}" }
+    ch_genome_bam.view{ "Ready for StringTie  Meta: ${it[0]}, Path: ${it[1]}" }}
 
 
 
