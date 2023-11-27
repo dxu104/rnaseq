@@ -2,7 +2,7 @@ process ASSIGN_STRAND_AFTER_STRINGTIE {
     tag "${meta.id}"
     label 'process_single'
 
-    conda "conda-forge::gawk=5.1.0"
+    container "ubuntu:latest"
 
     input:
     tuple val(meta), path(gtf)
