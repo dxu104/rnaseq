@@ -22,9 +22,9 @@ process ASSIGN_STRAND_AFTER_STRINGTIE {
     script:
     """
     #!/bin/bash
+
     touch delete_strand_after_StringTie.gtf
     touch only_modified_strand_part_after_StringTie.gtf
-
 
     awk -F'\t' '{
         if (\$7 == ".") {
