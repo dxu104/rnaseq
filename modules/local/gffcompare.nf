@@ -35,7 +35,7 @@ process GFFCOMPARE {
         $args \\
         $ref_fasta \\
         $ref_gtf \\
-        -o $prefix \\
+        -A -K -o $prefix \\
         $gtfs
 
     cat <<-END_VERSIONS > versions.yml
