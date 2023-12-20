@@ -125,7 +125,7 @@ include { GFFCOMPARE                   } from '../modules/local/gffcompare.nf'
 //include { FASTQC as FASTQC_AFTER_TRINITY} from '../modules/nf-core/fastqc/main'
 
 //StringTie merge modules
-include {STRINGTIE_MERGE} from '../modules/local/stringTie_merge/main.nf'
+//include {STRINGTIE_MERGE} from '../modules/local/stringTie_merge/main.nf'
 
 
 //
@@ -138,6 +138,7 @@ include { ALIGN_STAR     } from '../subworkflows/local/align_star'
 include { QUANTIFY_RSEM  } from '../subworkflows/local/quantify_rsem'
 include { QUANTIFY_SALMON as QUANTIFY_STAR_SALMON } from '../subworkflows/local/quantify_salmon'
 include { QUANTIFY_SALMON as QUANTIFY_SALMON      } from '../subworkflows/local/quantify_salmon'
+include { GTFINSERT      } from '../subworkflows/local/gtfinsert'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -835,24 +836,37 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
     ch_versions = ch_versions.mix(GFFCOMPARE.out.versions.first())
 
 
+    //December 20th, 2024 we add this gtfinsert subworkflow
+    // MODULE: GTFINSERT
 
 
-    //we add this
-    // MODULE: STRINGTIE_MERGE
-    //The module output: tuple val(meta), path("*.transcripts.gtf"), emit: transcript_gtf
-    if (!params.skip_alignment && !params.skip_stringtie) {
-        //modify the STRINGTIE_STRINGTIE output format to align the STRINGTIE_MERGE input format
+    // Call the GTFINSERT subworkflow
+    GTFINSERT(
+        GFFCOMPARE.out.annotated_gtf,
+        GFFCOMPARE.out.tracking,
+        ch_reference_gtf
 
-// 21th Nov: STRINGTIE_STRINGTIE.out.transcript_gtf will be changed to  ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf (which is a gtf file of deleting unspeficified standness of the stringtie output gtf file without -e option )
+    )
 
-        ch_stringtie_gtf_only = ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf.map { meta, gtf -> return gtf }
 
-        STRINGTIE_MERGE (
-            ch_stringtie_gtf_only,
-            PREPARE_GENOME.out.gtf
-        )
-        ch_versions = ch_versions.mix(STRINGTIE_MERGE.out.versions.first())
-    }
+
+//     //we delete this on December 20th, 2024 when we add this gtfinsert subworkflow,then change all previous STRINGTIE_MERGE.out.gtf to GTFINSERT.out.final_gtf
+//     // MODULE: STRINGTIE_MERGE
+//     //The module output: tuple val(meta), path("*.transcripts.gtf"), emit: transcript_gtf
+//     if (!params.skip_alignment && !params.skip_stringtie) {
+//         //modify the STRINGTIE_STRINGTIE output format to align the STRINGTIE_MERGE input format
+
+// // 21th Nov: STRINGTIE_STRINGTIE.out.transcript_gtf will be changed to  ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf (which is a gtf file of deleting unspeficified standness of the stringtie output gtf file without -e option )
+
+//         ch_stringtie_gtf_only = ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf.map { meta, gtf -> return gtf }
+
+//         STRINGTIE_MERGE (
+//             ch_stringtie_gtf_only,
+//             PREPARE_GENOME.out.gtf
+//         )
+//         ch_versions = ch_versions.mix(STRINGTIE_MERGE.out.versions.first())
+//     }
+
 
 
     // update ch_transcriptome_bam, below code from prepare_genome, I just change  MAKE_TRANSCRIPTS_FASTA name and GTF_GENE_FILTER name
@@ -866,7 +880,7 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
     } */
 
 
-    ch_filter_gtf = GTF_GENE_FILTER_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, STRINGTIE_MERGE.out.gtf ).gtf
+    ch_filter_gtf = GTF_GENE_FILTER_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, GTFINSERT.out.final_gtf ).gtf
         ch_transcript_fasta = MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, ch_filter_gtf ).transcript_fasta
         ch_versions         = ch_versions.mix(GTF_GENE_FILTER_FROM_NEW_GTF.out.versions)
         ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF.out.versions)
@@ -895,73 +909,10 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
         //
         // SUBWORKFLOW: Count reads from BAM alignments using Salmon
         // update previous PREPARE_GENOME.out.transcript_fasta, with new ch_transcript_fasta
-        // update previous PREPARE_GENOME.out.gtf with new STRINGTIE_MERGE.out.gtf
+        // update previous PREPARE_GENOME.out.gtf with new GTFINSERT.out.final_gtf
         //when you use ch_transcript_fasta, will have error SAM file says target ENSDART00000152259 has length 934, but the FASTA file contains a sequence of length [1772 or 1771]
         // I calcualte  ENSDART00000152259  length in origin Danio_rerio.GRCz11.109.gtf file, the  length is 934
-        /*
 
-        Exon 1 Length=59147540−59147385+1=156
-Exon 2 Length
-=
-59148361
-−
-59148231
-+
-1
-=
-131
-Exon 2 Length=59148361−59148231+1=131
-Exon 3 Length
-=
-59148500
-−
-59148457
-+
-1
-=
-44
-Exon 3 Length=59148500−59148457+1=44
-Exon 4 Length
-=
-59148808
-−
-59148759
-+
-1
-=
-50
-Exon 4 Length=59148808−59148759+1=50
-Exon 5 Length
-=
-59148970
-−
-59148887
-+
-1
-=
-84
-Exon 5 Length=59148970−59148887+1=84
-Exon 6 Length
-=
-59149173
-−
-59149052
-+
-1
-=
-122
-Exon 6 Length=59149173−59149052+1=122
-Exon 7 Length
-=
-59150220
-−
-59149874
-+
-1
-=
-347
-Exon 7 Length=59150220−59149874+1=347
-         */
 
          //when official pipeline use ch_dummy_file, the ch_dummy_file is empty, they just set PREPARE_GENOME.out.salmon_index  empty
 
@@ -969,7 +920,7 @@ Exon 7 Length=59150220−59149874+1=347
             // ch_transcriptome_bam,
             // ch_dummy_file,
             // PREPARE_GENOME.out.transcript_fasta,
-            // STRINGTIE_MERGE.out.gtf,
+            // GTFINSERT.out.final_gtf,
             // true,
             // params.salmon_quant_libtype ?: ''
 
@@ -980,7 +931,7 @@ Exon 7 Length=59150220−59149874+1=347
             ch_filtered_reads,
             ch_new_salmon_index,
             ch_dummy_file,
-            STRINGTIE_MERGE.out.gtf,
+            GTFINSERT.out.final_gtf,
             false,
             params.salmon_quant_libtype ?: ''
         )
@@ -1172,20 +1123,20 @@ Exon 7 Length=59150220−59149874+1=347
     //
     ch_featurecounts_multiqc = Channel.empty()
     if (!params.skip_alignment && !params.skip_qc && !params.skip_biotype_qc && biotype) {
- //update our  genome reference gtf file after applying STRINGTIE_MERGE module
-    //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
-        STRINGTIE_MERGE
+ //update our  genome reference gtf file after applying GTFINSERT module
+    //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
+        GTFINSERT
             .out
-            .gtf
+            .final_gtf
             .map { WorkflowRnaseq.biotypeInGtf(it, biotype, log) }
             .set { biotype_in_gtf }
 
         // Prevent any samples from running if GTF file doesn't have a valid biotype
 
-        //update our  genome reference gtf file after applying STRINGTIE_MERGE module
-    //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
+        //update our  genome reference gtf file after applying GTFINSERT module
+    //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
         ch_genome_bam
-            .combine(STRINGTIE_MERGE.out.gtf)
+            .combine(GTFINSERT.out.final_gtf)
             .combine(biotype_in_gtf)
             .filter { it[-1] }
             .map { it[0..<it.size()-1] }
@@ -1245,21 +1196,21 @@ Exon 7 Length=59150220−59149874+1=347
     ch_tin_multiqc                = Channel.empty()
     if (!params.skip_alignment && !params.skip_qc) {
         if (!params.skip_qualimap) {
-                  //update our  genome reference gtf file after applying STRINGTIE_MERGE module
-    //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
+                  //update our  genome reference gtf file after applying GTFINSERT module
+    //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
             QUALIMAP_RNASEQ (
                 ch_genome_bam,
-                STRINGTIE_MERGE.out.gtf.map { [ [:], it ] }
+                GTFINSERT.out.final_gtf.map { [ [:], it ] }
             )
             ch_qualimap_multiqc = QUALIMAP_RNASEQ.out.results
             ch_versions = ch_versions.mix(QUALIMAP_RNASEQ.out.versions.first())
         }
-             //update our  genome reference gtf file after applying STRINGTIE_MERGE module
-    //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
+             //update our  genome reference gtf file after applying GTFINSERT module
+    //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
         if (!params.skip_dupradar) {
             DUPRADAR (
                 ch_genome_bam,
-                STRINGTIE_MERGE.out.gtf
+                GTFINSERT.out.final_gtf
             )
             ch_dupradar_multiqc = DUPRADAR.out.multiqc
             ch_versions = ch_versions.mix(DUPRADAR.out.versions.first())
@@ -1315,15 +1266,15 @@ Exon 7 Length=59150220−59149874+1=347
     ch_pseudoaligner_pca_multiqc        = Channel.empty()
     ch_pseudoaligner_clustering_multiqc = Channel.empty()
     if (!params.skip_pseudo_alignment && params.pseudo_aligner == 'salmon') {
-                   //update our  genome reference gtf file after applying STRINGTIE_MERGE module
-    //using  STRINGTIE_MERGE.out.gtf to replace PREPARE_GENOME.out.gtf
+                   //update our  genome reference gtf file after applying GTFINSERT module
+    //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
     //when official pipeline use ch_dummy_file, the ch_dummy_file is empty, they just set transcript_fasta empty
 
        /*  QUANTIFY_SALMON (
             ch_filtered_reads,
             PREPARE_GENOME.out.salmon_index,
             ch_dummy_file,
-            STRINGTIE_MERGE.out.gtf,
+            GTFINSERT.out.final_gtf,
             false,
             params.salmon_quant_libtype ?: ''
         )
