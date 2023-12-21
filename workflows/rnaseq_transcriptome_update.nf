@@ -1418,6 +1418,7 @@ To create the `StringTieMerge` branch on your remote server and synchronize it w
     git checkout -b update_transcript_fasta origin/update_transcript_fasta
     git checkout -b axolotltest origin/axolotltest
     git checkout -b axolotl_test_module_update origin/axolotl_test_module_update
+    git checkout -b axolotl_test_module_update_gtfinsert origin/axolotl_test_module_update_gtfinsert
    ```
 
 By now, you should be on the `StringTieMerge` branch on your remote server, and it should be synchronized with the same branch in your GitHub repository.
@@ -1467,6 +1468,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //Runner HeadNode
 //copy file from HeadNode to local mac
+// cd /mnt/jfs/nextflow/dxu/rnaseq_transcriptome_update
 
 
 //Copy file from headnode to S3
