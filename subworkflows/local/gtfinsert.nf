@@ -1,12 +1,13 @@
-include { FIND_OVERLAP_TRANSCRIPT } from '../nextflow/find_overlap_transcript.nf'
-include { PARSE_GTF_TO_DICT } from '../nextflow/parse_gtf_to_dict_by_cmp_ref.nf'
-include { EXTRACT_KEY_VALUE } from '../nextflow/extract_key_value_pairs.nf'
-include { CHECK_UNIQUE_KEYS } from '../nextflow/check_key_unique.nf'
-include { UPDATE_KEYS } from '../nextflow/update_keys_with_tracking_key_value_pair.nf'
-include { PARSE_GTF_TO_DICT_BY_GENEID } from '../nextflow/parse_gtf_to_dict_by_geneID.nf'
-include { INSERT_BY_START_POSITION } from '../nextflow/insert_by_start_position.nf'
-include { JSON_TO_GTF} from '../nextflow/parse_json_gtf.nf'
-include { FIND_NOVEL_TRANSCRIPTS } from '../nextflow/find_novel_transcripts.nf'
+include { FIND_OVERLAP_TRANSCRIPT } from '../../modules/local/find_overlap_transcript'
+include { PARSE_GTF_TO_DICT } from '../../modules/local/parse_gtf_to_dict_by_cmp_ref'
+include { EXTRACT_KEY_VALUE } from '../../modules/local/extract_key_value_pairs'
+include { CHECK_UNIQUE_KEYS }  from '../../modules/local/check_key_unique'
+include { UPDATE_KEYS } from '../../modules/local/update_keys_with_tracking_key_value_pair'
+include { PARSE_GTF_TO_DICT_BY_GENEID } from '../../modules/local/parse_gtf_to_dict_by_geneID'
+include { INSERT_BY_START_POSITION } from '../../modules/local/insert_by_start_position'
+include { JSON_TO_GTF} from '../../modules/local/parse_json_gtf'
+include { FIND_NOVEL_TRANSCRIPTS } from '../../modules/local/find_novel_transcripts'
+
 
 workflow GTFINSERT {
     take:
