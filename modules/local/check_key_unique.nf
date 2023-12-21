@@ -43,10 +43,10 @@ process CHECK_UNIQUE_KEYS {
 
 }
 
-workflow {
-    // Define the input file path
-    ch_json_file = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/keyvalue.json')
+// workflow {
+//     // Define the input file path
+//     ch_json_file = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/keyvalue.json')
 
-    // Process the file
-    unique_keys_result = CHECK_UNIQUE_KEYS(ch_json_file.map { [ [:], it ] })
-}
+//     // Process the file
+//     unique_keys_result = CHECK_UNIQUE_KEYS(ch_json_file.map { [ [:], it ] })
+// }

@@ -45,16 +45,16 @@ process PARSE_GTF_TO_DICT {
     output_json_name = os.path.basename('${gtf}').replace('.gtf', '_cmp_ref_data.json')
 
     cmp_ref_dict = parse_gtf_to_dict_by_cmp_ref('${gtf}')
-    
+
     with open(output_json_name, 'w') as json_file:
         json.dump(cmp_ref_dict, json_file, indent=4)
     """
 }
 
-workflow {
-    // Define the input file path
-    ch_gtf = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/readyInsert.gtf')
+// workflow {
+//     // Define the input file path
+//     ch_gtf = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/readyInsert.gtf')
 
-    // Process the file
-    parsed_gtf_json = PARSE_GTF_TO_DICT(ch_gtf.map { [ [:], it ] })
-}
+//     // Process the file
+//     parsed_gtf_json = PARSE_GTF_TO_DICT(ch_gtf.map { [ [:], it ] })
+// }

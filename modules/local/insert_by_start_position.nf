@@ -80,11 +80,11 @@ process INSERT_BY_START_POSITION {
     """
 }
 
-workflow {
-    // Define the input file paths
-    ch_cmp_ref_data = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/cmp_ref_data_after_replace_key_trackingFile.json')
-    ch_reference_gtf = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/gene_id_data.json')
+// workflow {
+//     // Define the input file paths
+//     ch_cmp_ref_data = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/cmp_ref_data_after_replace_key_trackingFile.json')
+//     ch_reference_gtf = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/gene_id_data.json')
 
-    // Process the file
-    updated_reference_data_json = INSERT_BY_START_POSITION(ch_cmp_ref_data.map { [ [:], it ] }, ch_reference_gtf.map { [ [:], it ] })
-}
+//     // Process the file
+//     updated_reference_data_json = INSERT_BY_START_POSITION(ch_cmp_ref_data.map { [ [:], it ] }, ch_reference_gtf.map { [ [:], it ] })
+// }

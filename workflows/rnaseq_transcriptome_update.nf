@@ -841,6 +841,7 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
 
 
     // Call the GTFINSERT subworkflow
+
     GTFINSERT(
         GFFCOMPARE.out.annotated_gtf,
         GFFCOMPARE.out.tracking,
@@ -1479,7 +1480,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 // scp -i /Users/dxu/jfs_admin_multiuser_ssh.key dxu@52.55.106.191:/mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/ec/664b1b514bdc19e0114cbc64aac702 /Users/dxu/Documents/axolotStringTieMergeSuccess/outPutformFisrtSalmon_Index
 // scp -i /Users/dxu/jfs_admin_multiuser_ssh.key dxu@52.55.106.191:/mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/35/1c49e8* /Users/dxu/Documents/axolotStringTieMergeSuccess/resultsFromGffcompare/
-//scp -i /Users/dxu/jfs_admin_multiuser_ssh.key -r /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir root@ec2-52-55-106-191.compute-1.amazonaws.com:/mnt/jfs/nextflow/dxu
+//scp -i /Users/dxu/jfs_ssh.key -r /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir root@ec2-52-4-91-19.compute-1.amazonaws.com:/mnt/jfs/nextflow/dxu
 
 // !!!this is the command to run the pipeline on AWSBATCH no memverge
 // nextflow run main.nf -profile docker -c nextflow.AWSBatch.config -with-tower -work-dir s3://mdibl-nextflow-work/dxu/Bamsifter_why_merge_so_slow_AWSBatch_no_MemVerge -params-file ../launch_dir/zfTestAWSBatch/zf_params_AWSBatch.json

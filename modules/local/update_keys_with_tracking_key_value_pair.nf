@@ -51,14 +51,14 @@ process UPDATE_KEYS {
 
 }
 
-workflow {
-    // Define the input file paths
-    ch_keyValueFromTracking = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/keyvalue.json')
-    ch_cmpRefDataAsKey = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/cmp_ref_data.json')
+// workflow {
+//     // Define the input file paths
+//     ch_keyValueFromTracking = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/keyvalue.json')
+//     ch_cmpRefDataAsKey = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/cmp_ref_data.json')
 
-    // Process the file
-    updated_json = UPDATE_KEYS(ch_keyValueFromTracking.map { [ [:], it ] }, ch_cmpRefDataAsKey.map { [ [:], it ] })
+//     // Process the file
+//     updated_json = UPDATE_KEYS(ch_keyValueFromTracking.map { [ [:], it ] }, ch_cmpRefDataAsKey.map { [ [:], it ] })
 
 
 
-}
+// }

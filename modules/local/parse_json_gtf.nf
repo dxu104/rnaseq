@@ -36,10 +36,10 @@ process JSON_TO_GTF {
     """
 }
 
-workflow {
-    // Define the input file path
-    ch_json = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/updated_gene_id_data.json')
+// workflow {
+//     // Define the input file path
+//     ch_json = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/updated_gene_id_data.json')
 
-    // Process the file
-    output_gtf = JSON_TO_GTF(ch_json.map { [ [:], it ] })
-}
+//     // Process the file
+//     output_gtf = JSON_TO_GTF(ch_json.map { [ [:], it ] })
+// }

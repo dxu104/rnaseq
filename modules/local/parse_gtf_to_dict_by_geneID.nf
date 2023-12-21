@@ -44,16 +44,16 @@ process PARSE_GTF_TO_DICT_BY_GENEID {
     output_json_name = os.path.basename('${gtf}').replace('.gtf', '_gene_id_data.json')
 
     gene_id_dict = parse_gtf_to_dict_by_geneID('${gtf}')
-    
+
     with open(output_json_name, 'w') as json_file:
         json.dump(gene_id_dict, json_file, indent=4)
     """
 }
 
-workflow {
-    // Define the input file path
-    ch_gtf = Channel.fromPath('/Users/dxu/Documents/axolotlOmics/AmexT_v47-AmexG_v6.0-DD.gtf')
+// workflow {
+//     // Define the input file path
+//     ch_gtf = Channel.fromPath('/Users/dxu/Documents/axolotlOmics/AmexT_v47-AmexG_v6.0-DD.gtf')
 
-    // Process the file
-    parsed_gtf_json = PARSE_GTF_TO_DICT_BY_GENEID(ch_gtf.map { [ [:], it ] })
-}
+//     // Process the file
+//     parsed_gtf_json = PARSE_GTF_TO_DICT_BY_GENEID(ch_gtf.map { [ [:], it ] })
+// }

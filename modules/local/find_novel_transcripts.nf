@@ -68,11 +68,11 @@ process FIND_NOVEL_TRANSCRIPTS {
     """
 }
 
-workflow {
-    // Define the input file paths
-    ch_gtf = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/null.combined.gtf')
-    ch_ref_gtf = Channel.fromPath('/Users/dxu/Documents/axolotlOmics/AmexT_v47-AmexG_v6.0-DD.gtf')
+// workflow {
+//     // Define the input file paths
+//     ch_gtf = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/null.combined.gtf')
+//     ch_ref_gtf = Channel.fromPath('/Users/dxu/Documents/axolotlOmics/AmexT_v47-AmexG_v6.0-DD.gtf')
 
-    // Process the file
-    output_gtf_path = FIND_NOVEL_TRANSCRIPTS(ch_gtf.map { [ [:], it ] },ch_ref_gtf.map { [ [:], it ]} )
-}
+//     // Process the file
+//     output_gtf_path = FIND_NOVEL_TRANSCRIPTS(ch_gtf.map { [ [:], it ] },ch_ref_gtf.map { [ [:], it ]} )
+// }

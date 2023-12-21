@@ -26,7 +26,7 @@ process FIND_OVERLAP_TRANSCRIPT {
     def find_overlap_transcript(gtf, overlap_class_codes):
         # Generate output file name
         output_gtf_name = os.path.basename(gtf).replace('.gtf', '_ready_insert_transcript.gtf')
-        
+
         # Open the input GTF file
         with open(gtf, 'r') as file:
             combined_gtf_lines = file.readlines()
@@ -60,10 +60,10 @@ process FIND_OVERLAP_TRANSCRIPT {
 
 
 
-workflow {
-// Define the input file path
-ch_gtf = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/null.combined.gtf')
+// workflow {
+// // Define the input file path
+// ch_gtf = Channel.fromPath('/Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/null.combined.gtf')
 
-// Process the file
-output_gtf_path = FIND_OVERLAP_TRANSCRIPT(ch_gtf.map { [ [:], it ] })
-}
+// // Process the file
+// output_gtf_path = FIND_OVERLAP_TRANSCRIPT(ch_gtf.map { [ [:], it ] })
+// }
