@@ -2,7 +2,7 @@
 process PARSE_GTF_TO_DICT_BY_GENEID {
 
     tag "${meta.id}"
-    label 'process_medium'
+    label 'process_single'
 
     conda "conda-forge::python=3.9.5"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

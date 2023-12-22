@@ -841,9 +841,11 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
 
 
     // Call the GTFINSERT subworkflow
+    // if you only have one input sample, you can use ch_gtfinsert_input = GFFCOMPARE.out.annotated.gtf otherwise you need to use ch_gtfinsert_input = GFFCOMPARE.out.combined.gtf
 
+    ch_gffcompare_gtf = params.onlyOneInputSample ? GFFCOMPARE.out.annotated.gtf : GFFCOMPARE.out.combined.gtf
     GTFINSERT(
-        GFFCOMPARE.out.annotated_gtf,
+        ch_gffcompare_gtf,
         GFFCOMPARE.out.tracking,
         ch_reference_gtf
 
@@ -1470,7 +1472,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //copy file from HeadNode to local mac
 // cd /mnt/jfs/nextflow/dxu/rnaseq_transcriptome_update
 // cd /mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert
-// scp -r -i /Users/dxu/jfs_ssh.key root@52.4.91.19:/mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert/93/540c157655420fd35c93026b2bdd7f/ /Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/
+// scp -r -i /Users/dxu/jfs_ssh.key root@52.4.91.19:/mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert/24/5b28cb*/ /Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/
 
 
 // /mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert/93/540c157655420fd35c93026b2bdd7f/14-09158-4A_ATGCCT_L002.tracking

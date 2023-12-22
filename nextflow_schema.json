@@ -60,7 +60,23 @@
                     "type": "string",
                     "default": "AM-MIDBLv00001",
                     "description": "So for example, lets say, we decide to prefix all gene names with AM-MDIBL.  Then after stringtie –merge was run for the first time against the original reference gtf.  Given what I just said, our gene and transcript names for the updated merged gtf would become AM-MDIBLv00001.  The standard convention is that systematic gene IDs are consecutive on the genome, so starting with Chromosome 1, we would have AM-MIDBLv00001_000001, which means gene number 1 in version #1.  The isoforms of this gene would be AM-MIDBLv00001_000001.001, AM-MIDBLv00001_000001.002, and so on.  (This presumes no gene will ever have more than 1000 isoforms.). As you can see I have zero padded the counters in the naming, in order that they remain sortable in a meaningful way. So, to implement this we would need a program that modifies the output merged GTF, replacing all of the stringtie generated MSTRG names with what I defined above- it would also take in the current prefix and increment the version number, so that after the next RNAseq data set, we would have AM-MDIBLv00002, and so on."
+                },
+                "onlyOneInputSample": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "This parameter determines which input file should be used. If set to true, the script uses 'GFFCOMPARE.out.annotated.gtf' as the input. If false, it uses 'GFFCOMPARE.out.combined.gtf'. It is useful for handling scenarios with single or multiple input samples."
+                },
+                "overlapClassCodes": {
+                    "type": "array",
+                    "default": ["k", "m", "n", "j", "e"],
+                    "description": "This parameter specifies the class codes used to identify overlapping genes in the dataset. It's an array of characters where each character represents a specific type of gene overlap. For example, 'k' might represent one type of overlap, 'm' another, and so on."
+                },
+                "novelClassCodes": {
+                    "type": "array",
+                    "default": ["r", "u", "i", "y", "p"],
+                    "description": "This parameter defines the class codes that are used to identify novel genes in the dataset. Similar to 'overlapClassCodes', it's an array of characters where each character represents a specific type of novel gene. These codes are essential for categorizing and analyzing new gene types identified in the study."
                 }
+
             }
         },
         "umi_options": {
