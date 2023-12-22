@@ -67,12 +67,12 @@
                     "description": "This parameter determines which input file should be used. If set to true, the script uses 'GFFCOMPARE.out.annotated.gtf' as the input. If false, it uses 'GFFCOMPARE.out.combined.gtf'. It is useful for handling scenarios with single or multiple input samples."
                 },
                 "overlapClassCodes": {
-                    "type": "array",
+                    "type": "string",
                     "default": ["k", "m", "n", "j", "e"],
                     "description": "This parameter specifies the class codes used to identify overlapping genes in the dataset. It's an array of characters where each character represents a specific type of gene overlap. For example, 'k' might represent one type of overlap, 'm' another, and so on."
                 },
                 "novelClassCodes": {
-                    "type": "array",
+                    "type": "string",
                     "default": ["r", "u", "i", "y", "p"],
                     "description": "This parameter defines the class codes that are used to identify novel genes in the dataset. Similar to 'overlapClassCodes', it's an array of characters where each character represents a specific type of novel gene. These codes are essential for categorizing and analyzing new gene types identified in the study."
                 }
