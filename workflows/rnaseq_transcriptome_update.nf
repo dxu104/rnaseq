@@ -843,7 +843,7 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
     // Call the GTFINSERT subworkflow
     // if you only have one input sample, you can use ch_gtfinsert_input = GFFCOMPARE.out.annotated.gtf otherwise you need to use ch_gtfinsert_input = GFFCOMPARE.out.combined.gtf
 
-    ch_gffcompare_gtf = params.onlyOneInputSample ? GFFCOMPARE.out.annotated.gtf : GFFCOMPARE.out.combined.gtf
+    ch_gffcompare_gtf = params.onlyOneInputSample ? GFFCOMPARE.out.annotated_gtf : GFFCOMPARE.out.combined_gtf
     GTFINSERT(
         ch_gffcompare_gtf,
         GFFCOMPARE.out.tracking,
