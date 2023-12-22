@@ -27,17 +27,16 @@ process EXTRACT_KEY_VALUE {
         key_value_pairs = {}
         with open(input_file, 'r') as file:
             for line in file:
-                parts = line.split('|')
-                if len(parts) >= 2:
-                    #value is the first part of each line separated by '|'.
-                    value = parts[0].split()[-1]
-
-                    #The key is the third to last field in each line separated by spaces, and then separated again by '|' to take the last part.
-                    last_third_field = line.split()[-3]
-
-                    key = last_third_field.split('|')[-1]
-
-                    key_value_pairs[key] = value
+                parts = line.strip().split()
+                if len(parts) >= 4:
+                    # Extract all parts between the second and the penultimate fields
+                    relevant_part = ' '.join(parts[2:-2])
+                    # Split by the first '|' symbol
+                    split_parts = relevant_part.split('|', 1)
+                    if len(split_parts) == 2:
+                        value = split_parts[0].strip()
+                        key = split_parts[1].strip()
+                        key_value_pairs[key] = value
 
         return key_value_pairs
 
