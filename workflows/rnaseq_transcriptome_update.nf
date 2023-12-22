@@ -1470,6 +1470,7 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 
 //Runner HeadNode
 //copy file from HeadNode to local mac
+//scp -i /Users/dxu/jfs_ssh.key -r /Users/dxu/MDI/RNAseq_TrinityNormalization/launch_dir root@ec2-52-4-91-19.compute-1.amazonaws.com:/mnt/jfs/nextflow/dxu
 // cd /mnt/jfs/nextflow/dxu/rnaseq_transcriptome_update
 // cd /mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert
 // scp -r -i /Users/dxu/jfs_ssh.key root@52.4.91.19:/mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert/24/5b28cb*/ /Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/

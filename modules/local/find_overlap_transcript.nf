@@ -1,4 +1,3 @@
-// main.nf
 process FIND_OVERLAP_TRANSCRIPT {
 
     tag "${meta.id}"
