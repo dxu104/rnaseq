@@ -2,12 +2,7 @@
 process EXTRACT_KEY_VALUE {
 
     tag "${meta.id}"
-    label 'process_medium'
-
-    conda "conda-forge::python=3.9.5"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/python:3.9--1' :
-        'biocontainers/python:3.9--1' }"
+    label 'process_single'
 
     input:
     tuple val(meta), path(input_file)
@@ -30,8 +25,14 @@ process EXTRACT_KEY_VALUE {
             for line in file:
                 parts = line.split('|')
                 if len(parts) >= 2:
+                    #value is the first part of each line separated by '|'.
                     value = parts[0].split()[-1]
-                    key = parts[1].split()[0]
+
+                    #The key is the third to last field in each line separated by spaces, and then separated again by '|' to take the last part.
+                    last_third_field = line.split()[-3]
+
+                    key = last_third_field.split('|')[-1]
+
                     key_value_pairs[key] = value
 
         return key_value_pairs

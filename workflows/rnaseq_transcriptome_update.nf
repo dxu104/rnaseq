@@ -1469,8 +1469,11 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 //Runner HeadNode
 //copy file from HeadNode to local mac
 // cd /mnt/jfs/nextflow/dxu/rnaseq_transcriptome_update
+// cd /mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert
+// scp -r -i /Users/dxu/jfs_ssh.key root@52.4.91.19:/mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert/93/540c157655420fd35c93026b2bdd7f/ /Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/
 
 
+// /mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert/93/540c157655420fd35c93026b2bdd7f/14-09158-4A_ATGCCT_L002.tracking
 //Copy file from headnode to S3
 //This is original salmon_Index from REPARE_GENOME:SALMON_INDEX:  aws s3 sync /mnt/jfs/nextflow/dxu/axolotl2samples_Nov1st2023/9e/24ca52b68c1a08e40844f98ce7e3d4/salmon s3://biocore-data/JamesGodwin/jgodwin_001/AxolotlSalmonIndexFromREPARE_GENOME_SALMON_INDEX/
 
