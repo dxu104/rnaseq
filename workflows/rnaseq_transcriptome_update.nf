@@ -1213,7 +1213,7 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
         if (!params.skip_dupradar) {
             DUPRADAR (
                 ch_genome_bam,
-                GTFINSERT.out.final_gtf
+                GTFINSERT.out.final_gtf.map { [ [:], it ] }
             )
             ch_dupradar_multiqc = DUPRADAR.out.multiqc
             ch_versions = ch_versions.mix(DUPRADAR.out.versions.first())
