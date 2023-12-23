@@ -1128,9 +1128,8 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
     if (!params.skip_alignment && !params.skip_qc && !params.skip_biotype_qc && biotype) {
  //update our  genome reference gtf file after applying GTFINSERT module
     //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
-        GTFINSERT
-            .out
-            .final_gtf
+        GTFINSERT.out.final_gtf
+            .map { it[1] } // extact the path from the tuple
             .map { WorkflowRnaseq.biotypeInGtf(it, biotype, log) }
             .set { biotype_in_gtf }
 
