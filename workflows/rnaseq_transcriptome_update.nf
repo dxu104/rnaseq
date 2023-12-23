@@ -1203,7 +1203,8 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
     //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
             QUALIMAP_RNASEQ (
                 ch_genome_bam,
-                GTFINSERT.out.final_gtf.map { [[:], it ] }
+                GTFINSERT.out.final_gtf
+                //.map { [[:], it ] }
             )
             ch_qualimap_multiqc = QUALIMAP_RNASEQ.out.results
             ch_versions = ch_versions.mix(QUALIMAP_RNASEQ.out.versions.first())
@@ -1211,13 +1212,12 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
              //update our  genome reference gtf file after applying GTFINSERT module
     //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
 
-    // 打印 ch_genome_bam 的内容和类型
+
     ch_genome_bam.view { item ->
         println("ch_genome_bam item: $item")
         println("Type: ${item.getClass()}")
     }
 
-    // 打印 GTFINSERT.out.final_gtf 的内容和类型
     GTFINSERT.out.final_gtf.view { gtf ->
         println("GTFINSERT.out.final_gtf: $gtf")
         println("Type: ${gtf.getClass()}")
@@ -1226,7 +1226,7 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
         if (!params.skip_dupradar) {
             DUPRADAR (
                 ch_genome_bam,
-                GTFINSERT.out.final_gtf
+                GTFINSERT.out.final_gtf.map { it -> it[1]}
             )
             ch_dupradar_multiqc = DUPRADAR.out.multiqc
             ch_versions = ch_versions.mix(DUPRADAR.out.versions.first())
