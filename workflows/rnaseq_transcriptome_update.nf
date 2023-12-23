@@ -883,7 +883,7 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
     } */
 
 
-    ch_filter_gtf = GTF_GENE_FILTER_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, GTFINSERT.out.final_gtf ).gtf
+    ch_filter_gtf = GTF_GENE_FILTER_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, GTFINSERT.out.final_gtf.map { it -> it[1]} ).gtf
         ch_transcript_fasta = MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, ch_filter_gtf ).transcript_fasta
         ch_versions         = ch_versions.mix(GTF_GENE_FILTER_FROM_NEW_GTF.out.versions)
         ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF.out.versions)
@@ -934,7 +934,7 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
             ch_filtered_reads,
             ch_new_salmon_index,
             ch_dummy_file,
-            GTFINSERT.out.final_gtf,
+            GTFINSERT.out.final_gtf.map { it -> it[1]},
             false,
             params.salmon_quant_libtype ?: ''
         )
@@ -1139,7 +1139,7 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
         //update our  genome reference gtf file after applying GTFINSERT module
     //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
         ch_genome_bam
-            .combine(GTFINSERT.out.final_gtf)
+            .combine(GTFINSERT.out.final_gtf.map { it -> it[1]})
             .combine(biotype_in_gtf)
             .filter { it[-1] }
             .map { it[0..<it.size()-1] }
