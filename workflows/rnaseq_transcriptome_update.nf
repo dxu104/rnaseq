@@ -1210,6 +1210,19 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
         }
              //update our  genome reference gtf file after applying GTFINSERT module
     //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
+
+    // 打印 ch_genome_bam 的内容和类型
+    ch_genome_bam.view { item ->
+        println("ch_genome_bam item: $item")
+        println("Type: ${item.getClass()}")
+    }
+
+    // 打印 GTFINSERT.out.final_gtf 的内容和类型
+    GTFINSERT.out.final_gtf.view { gtf ->
+        println("GTFINSERT.out.final_gtf: $gtf")
+        println("Type: ${gtf.getClass()}")
+    }
+
         if (!params.skip_dupradar) {
             DUPRADAR (
                 ch_genome_bam,
