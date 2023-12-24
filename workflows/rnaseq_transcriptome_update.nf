@@ -1486,7 +1486,11 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 // cd /mnt/jfs/nextflow/dxu/rnaseq_transcriptome_update
 // cd /mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert
 // scp -r -i /Users/dxu/jfs_ssh.key root@52.4.91.19:/mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert/18/86f5460dcc30bc577b0aeba1ccec4e/14-09158-4A_ATGCCT_L002.combined.gtf /Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/
-
+// origin gtf in json parameter "gtf": "s3://biocore-data/JamesGodwin/jgodwin_001/gtfFile/AmexT_v47-AmexG_v6.0-DD_fromAxolotlOmics_addmcherry.gtf",
+//  "gtf": "s3://biocore-data/JamesGodwin/jgodwin_001/gtfFile/completedGtfInsertTwoAxolotSample.gtf", 
+//No index
+//  "salmon_index" : "s3://biocore-data/JamesGodwin/jgodwin_001/AxolotlSalmonIndexFromREPARE_GENOME_SALMON_INDEX/",
+//    "star_index" : "s3://biocore-data/JamesGodwin/jgodwin_001/AxolotlStarIndex/",
 
 // /mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert/93/540c157655420fd35c93026b2bdd7f/14-09158-4A_ATGCCT_L002.tracking
 //Copy file from headnode to S3

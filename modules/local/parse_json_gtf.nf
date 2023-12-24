@@ -13,7 +13,7 @@ process JSON_TO_GTF {
     tuple val(meta), path(json)
 
     output:
-    tuple val(meta), path("*.gtf"), emit: final_annotation
+    tuple val(meta), path("*.gtf"), emit: finished_insert_overlap_transcript_gtf
 
 
     when:
@@ -35,7 +35,7 @@ process JSON_TO_GTF {
                     gtf_file.write(line + '\\n')
 
     # Generate output GTF file name based on JSON file
-    output_gtf_name = os.path.basename('${json}').replace('.json', '_final_annotation.gtf')
+    output_gtf_name ='finished_insert_overlap_transcript.gtf'
 
     json_to_gtf('${json}', output_gtf_name)
     """

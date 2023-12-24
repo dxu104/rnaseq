@@ -14,7 +14,7 @@ process INSERT_BY_START_POSITION {
     tuple val(meta), path(reference_gtf)
 
     output:
-    tuple val(meta), path("*.json"), emit: final_annotation_json
+    tuple val(meta), path("*.json"), emit: finished_insert_overlap_transcript_json
 
     when:
     task.ext.when == null || task.ext.when
@@ -79,7 +79,7 @@ process INSERT_BY_START_POSITION {
             reference_data[cmp_ref] = [line for sublist in reference_value.values() for line in sublist]
 
     # Generate output JSON file name
-    output_json_name = '${meta.id}_final_annotation.json'
+    output_json_name = 'finished_insert_overlap_transcript.json'
     with open(output_json_name, 'w') as json_file:
         json.dump(reference_data, json_file, indent=4)
     """

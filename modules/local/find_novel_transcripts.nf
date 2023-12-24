@@ -36,7 +36,7 @@ process FIND_NOVEL_TRANSCRIPTS {
 
 
         # Generate output file name based on combined GTF file
-        output_gtf_name = os.path.basename(gtf).replace('.gtf', '_ready_append_transcript.gtf')
+        output_gtf_name ='final_annotation.gtf'
 
         # Read the combined GTF file
         with open(gtf, 'r') as file:

@@ -41,11 +41,11 @@ workflow GTFINSERT {
 
     // Finalization
     // Step 8: Parse JSON GTF
-    JSON_TO_GTF(INSERT_BY_START_POSITION.out.final_annotation_json)
+    JSON_TO_GTF(INSERT_BY_START_POSITION.out.finished_insert_overlap_transcript_json)
 
     // Handling Novel Transcripts
     // Step 9: Find novel transcripts
-    FIND_NOVEL_TRANSCRIPTS(combined_gtf,JSON_TO_GTF.out.final_annotation)
+    FIND_NOVEL_TRANSCRIPTS(combined_gtf,JSON_TO_GTF.out.finished_insert_overlap_transcript_gtf)
 
     emit:
     final_gtf = FIND_NOVEL_TRANSCRIPTS.out.final_annotation_gtf  //select_transcript_append_based_on_gffcompare_class_code_to_generate_final_gtf
