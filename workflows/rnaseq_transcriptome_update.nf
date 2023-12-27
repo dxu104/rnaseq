@@ -850,525 +850,526 @@ ch_reference_gtf = PREPARE_GENOME.out.gtf.map { [ [:], it ] }
         ch_reference_gtf
 
     )
+}
 
 
 
-//     //we delete this on December 20th, 2024 when we add this gtfinsert subworkflow,then change all previous STRINGTIE_MERGE.out.gtf to GTFINSERT.out.final_gtf
-//     // MODULE: STRINGTIE_MERGE
-//     //The module output: tuple val(meta), path("*.transcripts.gtf"), emit: transcript_gtf
-//     if (!params.skip_alignment && !params.skip_stringtie) {
-//         //modify the STRINGTIE_STRINGTIE output format to align the STRINGTIE_MERGE input format
+// //     //we delete this on December 20th, 2024 when we add this gtfinsert subworkflow,then change all previous STRINGTIE_MERGE.out.gtf to GTFINSERT.out.final_gtf
+// //     // MODULE: STRINGTIE_MERGE
+// //     //The module output: tuple val(meta), path("*.transcripts.gtf"), emit: transcript_gtf
+// //     if (!params.skip_alignment && !params.skip_stringtie) {
+// //         //modify the STRINGTIE_STRINGTIE output format to align the STRINGTIE_MERGE input format
 
-// // 21th Nov: STRINGTIE_STRINGTIE.out.transcript_gtf will be changed to  ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf (which is a gtf file of deleting unspeficified standness of the stringtie output gtf file without -e option )
+// // // 21th Nov: STRINGTIE_STRINGTIE.out.transcript_gtf will be changed to  ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf (which is a gtf file of deleting unspeficified standness of the stringtie output gtf file without -e option )
 
-//         ch_stringtie_gtf_only = ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf.map { meta, gtf -> return gtf }
+// //         ch_stringtie_gtf_only = ASSIGN_STRAND_AFTER_STRINGTIE.out.processed_gtf.map { meta, gtf -> return gtf }
 
-//         STRINGTIE_MERGE (
-//             ch_stringtie_gtf_only,
-//             PREPARE_GENOME.out.gtf
+// //         STRINGTIE_MERGE (
+// //             ch_stringtie_gtf_only,
+// //             PREPARE_GENOME.out.gtf
+// //         )
+// //         ch_versions = ch_versions.mix(STRINGTIE_MERGE.out.versions.first())
+// //     }
+
+
+
+//     // update ch_transcriptome_bam, below code from prepare_genome, I just change  MAKE_TRANSCRIPTS_FASTA name and GTF_GENE_FILTER name
+
+//  /*     previous code like:
+//     else {
+//         ch_filter_gtf = GTF_GENE_FILTER ( ch_fasta, ch_gtf ).gtf
+//         ch_transcript_fasta = MAKE_TRANSCRIPTS_FASTA ( ch_fasta, ch_filter_gtf ).transcript_fasta
+//         ch_versions         = ch_versions.mix(GTF_GENE_FILTER.out.versions)
+//         ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA.out.versions)
+//     } */
+
+
+//     ch_filter_gtf = GTF_GENE_FILTER_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, GTFINSERT.out.final_gtf.map { it -> it[1]} ).gtf
+//         ch_transcript_fasta = MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, ch_filter_gtf ).transcript_fasta
+//         ch_versions         = ch_versions.mix(GTF_GENE_FILTER_FROM_NEW_GTF.out.versions)
+//         ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF.out.versions)
+
+//       ch_new_salmon_index =  SALMON_INDEX_FROM_NEW_TRANSCRIPT_FASTA (
+
+//             PREPARE_GENOME.out.fasta,
+//              ch_transcript_fasta
+//         ).index
+
+//          ch_versions         = ch_versions.mix(SALMON_INDEX_FROM_NEW_TRANSCRIPT_FASTA.out.versions)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//         //
+//         // SUBWORKFLOW: Count reads from BAM alignments using Salmon
+//         // update previous PREPARE_GENOME.out.transcript_fasta, with new ch_transcript_fasta
+//         // update previous PREPARE_GENOME.out.gtf with new GTFINSERT.out.final_gtf
+//         //when you use ch_transcript_fasta, will have error SAM file says target ENSDART00000152259 has length 934, but the FASTA file contains a sequence of length [1772 or 1771]
+//         // I calcualte  ENSDART00000152259  length in origin Danio_rerio.GRCz11.109.gtf file, the  length is 934
+
+
+//          //when official pipeline use ch_dummy_file, the ch_dummy_file is empty, they just set PREPARE_GENOME.out.salmon_index  empty
+
+//         QUANTIFY_STAR_SALMON (
+//             // ch_transcriptome_bam,
+//             // ch_dummy_file,
+//             // PREPARE_GENOME.out.transcript_fasta,
+//             // GTFINSERT.out.final_gtf,
+//             // true,
+//             // params.salmon_quant_libtype ?: ''
+
+
+//       // instead using bam as input we use raw fastq, since bam from old gtf.
+//       //we also need to update PREPARE_GENOME.out.salmon_index with ch_new_salmon_index  using ch_transcript_fasta
+
+//             ch_filtered_reads,
+//             ch_new_salmon_index,
+//             ch_dummy_file,
+//             GTFINSERT.out.final_gtf.map { it -> it[1]},
+//             false,
+//             params.salmon_quant_libtype ?: ''
 //         )
-//         ch_versions = ch_versions.mix(STRINGTIE_MERGE.out.versions.first())
+//         ch_versions = ch_versions.mix(QUANTIFY_STAR_SALMON.out.versions)
+
+//         /* if (!params.skip_qc & !params.skip_deseq2_qc) {
+//             DESEQ2_QC_STAR_SALMON (
+//                 QUANTIFY_STAR_SALMON.out.counts_gene_length_scaled,
+//                 ch_pca_header_multiqc,
+//                 ch_clustering_header_multiqc
+//             )
+//             ch_aligner_pca_multiqc        = DESEQ2_QC_STAR_SALMON.out.pca_multiqc
+//             ch_aligner_clustering_multiqc = DESEQ2_QC_STAR_SALMON.out.dists_multiqc
+//             ch_versions = ch_versions.mix(DESEQ2_QC_STAR_SALMON.out.versions)
+//         } */
+//     }
+//     //this purple barcket is for star_align
+
+
+
+//     //
+//     // SUBWORKFLOW: Alignment with STAR and gene/transcript quantification with RSEM
+//     // in nextflow config file aligner = stat_salmon
+//   /*   ch_rsem_multiqc = Channel.empty()
+//     if (!params.skip_alignment && params.aligner == 'star_rsem') {
+//         QUANTIFY_RSEM (
+//             ch_filtered_reads,
+//             PREPARE_GENOME.out.rsem_index,
+//             PREPARE_GENOME.out.fasta.map { [ [:], it ] }
+//         )
+//         ch_genome_bam        = QUANTIFY_RSEM.out.bam
+//         ch_genome_bam_index  = QUANTIFY_RSEM.out.bai
+//         ch_samtools_stats    = QUANTIFY_RSEM.out.stats
+//         ch_samtools_flagstat = QUANTIFY_RSEM.out.flagstat
+//         ch_samtools_idxstats = QUANTIFY_RSEM.out.idxstats
+//         ch_star_multiqc      = QUANTIFY_RSEM.out.logs
+//         ch_rsem_multiqc      = QUANTIFY_RSEM.out.stat
+//         if (params.bam_csi_index) {
+//             ch_genome_bam_index = QUANTIFY_RSEM.out.csi
+//         }
+//         ch_versions = ch_versions.mix(QUANTIFY_RSEM.out.versions)
+
+//         if (!params.skip_qc & !params.skip_deseq2_qc) {
+//             DESEQ2_QC_RSEM (
+//                 QUANTIFY_RSEM.out.merged_counts_gene,
+//                 ch_pca_header_multiqc,
+//                 ch_clustering_header_multiqc
+//             )
+//             ch_aligner_pca_multiqc        = DESEQ2_QC_RSEM.out.pca_multiqc
+//             ch_aligner_clustering_multiqc = DESEQ2_QC_RSEM.out.dists_multiqc
+//             ch_versions = ch_versions.mix(DESEQ2_QC_RSEM.out.versions)
+//         }
+//     }
+
+
+//     //
+//     // SUBWORKFLOW: Alignment with HISAT2
+//     //
+//     ch_hisat2_multiqc = Channel.empty()
+//     if (!params.skip_alignment && params.aligner == 'hisat2') {
+//         FASTQ_ALIGN_HISAT2 (
+//             ch_filtered_reads,
+//             PREPARE_GENOME.out.hisat2_index.map { [ [:], it ] },
+//             PREPARE_GENOME.out.splicesites.map { [ [:], it ] },
+//             PREPARE_GENOME.out.fasta.map { [ [:], it ] }
+//         )
+//         ch_genome_bam        = FASTQ_ALIGN_HISAT2.out.bam
+//         ch_genome_bam_index  = FASTQ_ALIGN_HISAT2.out.bai
+//         ch_samtools_stats    = FASTQ_ALIGN_HISAT2.out.stats
+//         ch_samtools_flagstat = FASTQ_ALIGN_HISAT2.out.flagstat
+//         ch_samtools_idxstats = FASTQ_ALIGN_HISAT2.out.idxstats
+//         ch_hisat2_multiqc    = FASTQ_ALIGN_HISAT2.out.summary
+//         if (params.bam_csi_index) {
+//             ch_genome_bam_index = FASTQ_ALIGN_HISAT2.out.csi
+//         }
+//         ch_versions = ch_versions.mix(FASTQ_ALIGN_HISAT2.out.versions)
+
+//         //
+//         // SUBWORKFLOW: Remove duplicate reads from BAM file based on UMIs
+//         // default  with_umi  = fasle
+
+//         if (params.with_umi) {
+//             BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME (
+//                 ch_genome_bam.join(ch_genome_bam_index, by: [0]),
+//                 params.umitools_dedup_stats
+//             )
+//             ch_genome_bam        = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.bam
+//             ch_genome_bam_index  = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.bai
+//             ch_samtools_stats    = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.stats
+//             ch_samtools_flagstat = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.flagstat
+//             ch_samtools_idxstats = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.idxstats
+//             if (params.bam_csi_index) {
+//                 ch_genome_bam_index = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.csi
+//             }
+//             ch_versions = ch_versions.mix(BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.versions)
+//         }
+
+
 //     }
 
 
 
-    // update ch_transcriptome_bam, below code from prepare_genome, I just change  MAKE_TRANSCRIPTS_FASTA name and GTF_GENE_FILTER name
 
- /*     previous code like:
-    else {
-        ch_filter_gtf = GTF_GENE_FILTER ( ch_fasta, ch_gtf ).gtf
-        ch_transcript_fasta = MAKE_TRANSCRIPTS_FASTA ( ch_fasta, ch_filter_gtf ).transcript_fasta
-        ch_versions         = ch_versions.mix(GTF_GENE_FILTER.out.versions)
-        ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA.out.versions)
-    } */
 
-
-    ch_filter_gtf = GTF_GENE_FILTER_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, GTFINSERT.out.final_gtf.map { it -> it[1]} ).gtf
-        ch_transcript_fasta = MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF ( PREPARE_GENOME.out.fasta, ch_filter_gtf ).transcript_fasta
-        ch_versions         = ch_versions.mix(GTF_GENE_FILTER_FROM_NEW_GTF.out.versions)
-        ch_versions         = ch_versions.mix(MAKE_TRANSCRIPTS_FASTA_FROM_NEW_GTF.out.versions)
-
-      ch_new_salmon_index =  SALMON_INDEX_FROM_NEW_TRANSCRIPT_FASTA (
-
-            PREPARE_GENOME.out.fasta,
-             ch_transcript_fasta
-        ).index
-
-         ch_versions         = ch_versions.mix(SALMON_INDEX_FROM_NEW_TRANSCRIPT_FASTA.out.versions)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //
-        // SUBWORKFLOW: Count reads from BAM alignments using Salmon
-        // update previous PREPARE_GENOME.out.transcript_fasta, with new ch_transcript_fasta
-        // update previous PREPARE_GENOME.out.gtf with new GTFINSERT.out.final_gtf
-        //when you use ch_transcript_fasta, will have error SAM file says target ENSDART00000152259 has length 934, but the FASTA file contains a sequence of length [1772 or 1771]
-        // I calcualte  ENSDART00000152259  length in origin Danio_rerio.GRCz11.109.gtf file, the  length is 934
-
-
-         //when official pipeline use ch_dummy_file, the ch_dummy_file is empty, they just set PREPARE_GENOME.out.salmon_index  empty
-
-        QUANTIFY_STAR_SALMON (
-            // ch_transcriptome_bam,
-            // ch_dummy_file,
-            // PREPARE_GENOME.out.transcript_fasta,
-            // GTFINSERT.out.final_gtf,
-            // true,
-            // params.salmon_quant_libtype ?: ''
-
-
-      // instead using bam as input we use raw fastq, since bam from old gtf.
-      //we also need to update PREPARE_GENOME.out.salmon_index with ch_new_salmon_index  using ch_transcript_fasta
-
-            ch_filtered_reads,
-            ch_new_salmon_index,
-            ch_dummy_file,
-            GTFINSERT.out.final_gtf.map { it -> it[1]},
-            false,
-            params.salmon_quant_libtype ?: ''
-        )
-        ch_versions = ch_versions.mix(QUANTIFY_STAR_SALMON.out.versions)
-
-        /* if (!params.skip_qc & !params.skip_deseq2_qc) {
-            DESEQ2_QC_STAR_SALMON (
-                QUANTIFY_STAR_SALMON.out.counts_gene_length_scaled,
-                ch_pca_header_multiqc,
-                ch_clustering_header_multiqc
-            )
-            ch_aligner_pca_multiqc        = DESEQ2_QC_STAR_SALMON.out.pca_multiqc
-            ch_aligner_clustering_multiqc = DESEQ2_QC_STAR_SALMON.out.dists_multiqc
-            ch_versions = ch_versions.mix(DESEQ2_QC_STAR_SALMON.out.versions)
-        } */
-    }
-    //this purple barcket is for star_align
-
-
-
-    //
-    // SUBWORKFLOW: Alignment with STAR and gene/transcript quantification with RSEM
-    // in nextflow config file aligner = stat_salmon
-  /*   ch_rsem_multiqc = Channel.empty()
-    if (!params.skip_alignment && params.aligner == 'star_rsem') {
-        QUANTIFY_RSEM (
-            ch_filtered_reads,
-            PREPARE_GENOME.out.rsem_index,
-            PREPARE_GENOME.out.fasta.map { [ [:], it ] }
-        )
-        ch_genome_bam        = QUANTIFY_RSEM.out.bam
-        ch_genome_bam_index  = QUANTIFY_RSEM.out.bai
-        ch_samtools_stats    = QUANTIFY_RSEM.out.stats
-        ch_samtools_flagstat = QUANTIFY_RSEM.out.flagstat
-        ch_samtools_idxstats = QUANTIFY_RSEM.out.idxstats
-        ch_star_multiqc      = QUANTIFY_RSEM.out.logs
-        ch_rsem_multiqc      = QUANTIFY_RSEM.out.stat
-        if (params.bam_csi_index) {
-            ch_genome_bam_index = QUANTIFY_RSEM.out.csi
-        }
-        ch_versions = ch_versions.mix(QUANTIFY_RSEM.out.versions)
-
-        if (!params.skip_qc & !params.skip_deseq2_qc) {
-            DESEQ2_QC_RSEM (
-                QUANTIFY_RSEM.out.merged_counts_gene,
-                ch_pca_header_multiqc,
-                ch_clustering_header_multiqc
-            )
-            ch_aligner_pca_multiqc        = DESEQ2_QC_RSEM.out.pca_multiqc
-            ch_aligner_clustering_multiqc = DESEQ2_QC_RSEM.out.dists_multiqc
-            ch_versions = ch_versions.mix(DESEQ2_QC_RSEM.out.versions)
-        }
-    }
-
-
-    //
-    // SUBWORKFLOW: Alignment with HISAT2
-    //
-    ch_hisat2_multiqc = Channel.empty()
-    if (!params.skip_alignment && params.aligner == 'hisat2') {
-        FASTQ_ALIGN_HISAT2 (
-            ch_filtered_reads,
-            PREPARE_GENOME.out.hisat2_index.map { [ [:], it ] },
-            PREPARE_GENOME.out.splicesites.map { [ [:], it ] },
-            PREPARE_GENOME.out.fasta.map { [ [:], it ] }
-        )
-        ch_genome_bam        = FASTQ_ALIGN_HISAT2.out.bam
-        ch_genome_bam_index  = FASTQ_ALIGN_HISAT2.out.bai
-        ch_samtools_stats    = FASTQ_ALIGN_HISAT2.out.stats
-        ch_samtools_flagstat = FASTQ_ALIGN_HISAT2.out.flagstat
-        ch_samtools_idxstats = FASTQ_ALIGN_HISAT2.out.idxstats
-        ch_hisat2_multiqc    = FASTQ_ALIGN_HISAT2.out.summary
-        if (params.bam_csi_index) {
-            ch_genome_bam_index = FASTQ_ALIGN_HISAT2.out.csi
-        }
-        ch_versions = ch_versions.mix(FASTQ_ALIGN_HISAT2.out.versions)
-
-        //
-        // SUBWORKFLOW: Remove duplicate reads from BAM file based on UMIs
-        // default  with_umi  = fasle
-
-        if (params.with_umi) {
-            BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME (
-                ch_genome_bam.join(ch_genome_bam_index, by: [0]),
-                params.umitools_dedup_stats
-            )
-            ch_genome_bam        = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.bam
-            ch_genome_bam_index  = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.bai
-            ch_samtools_stats    = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.stats
-            ch_samtools_flagstat = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.flagstat
-            ch_samtools_idxstats = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.idxstats
-            if (params.bam_csi_index) {
-                ch_genome_bam_index = BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.csi
-            }
-            ch_versions = ch_versions.mix(BAM_DEDUP_STATS_SAMTOOLS_UMITOOLS_GENOME.out.versions)
-        }
-
-
-    }
-
-
-
-
-
-    //
-    // Filter channels to get samples that passed STAR minimum mapping percentage
-    //
-    ch_fail_mapping_multiqc = Channel.empty()
-    if (!params.skip_alignment && params.aligner.contains('star')) {
-        ch_star_multiqc
-            .map { meta, align_log -> [ meta ] + WorkflowRnaseq.getStarPercentMapped(params, align_log) }
-            .set { ch_percent_mapped }
-
-        ch_genome_bam
-            .join(ch_percent_mapped, by: [0])
-            .map { meta, ofile, mapped, pass -> if (pass) [ meta, ofile ] }
-            .set { ch_genome_bam }
-
-        ch_genome_bam_index
-            .join(ch_percent_mapped, by: [0])
-            .map { meta, ofile, mapped, pass -> if (pass) [ meta, ofile ] }
-            .set { ch_genome_bam_index }
-
-        ch_percent_mapped
-            .branch { meta, mapped, pass ->
-                pass: pass
-                    pass_mapped_reads[meta.id] = true
-                    return [ "$meta.id\t$mapped" ]
-                fail: !pass
-                    pass_mapped_reads[meta.id] = false
-                    return [ "$meta.id\t$mapped" ]
-            }
-            .set { ch_pass_fail_mapped }
-
-        ch_pass_fail_mapped
-            .fail
-            .collect()
-            .map {
-                tsv_data ->
-                    def header = ["Sample", "STAR uniquely mapped reads (%)"]
-                    WorkflowRnaseq.multiqcTsvFromList(tsv_data, header)
-            }
-            .set { ch_fail_mapping_multiqc }
-    }
-
-    //
-    // MODULE: Run Preseq
-    // skip_qc = false skip_preseq true
-
-   /*  ch_preseq_multiqc = Channel.empty()
-    if (!params.skip_alignment && !params.skip_qc && !params.skip_preseq) {
-        PRESEQ_LCEXTRAP (
-            ch_genome_bam
-        )
-        ch_preseq_multiqc = PRESEQ_LCEXTRAP.out.lc_extrap
-        ch_versions = ch_versions.mix(PRESEQ_LCEXTRAP.out.versions.first())
-    }
- */
-
-    //
-    // SUBWORKFLOW: Mark duplicate reads
-    //
-    ch_markduplicates_multiqc = Channel.empty()
-    if (!params.skip_alignment && !params.skip_markduplicates && !params.with_umi) {
-        BAM_MARKDUPLICATES_PICARD (
-            ch_genome_bam,
-            PREPARE_GENOME.out.fasta.map { [ [:], it ] },
-            PREPARE_GENOME.out.fai.map { [ [:], it ] }
-        )
-        ch_genome_bam             = BAM_MARKDUPLICATES_PICARD.out.bam
-        ch_genome_bam_index       = BAM_MARKDUPLICATES_PICARD.out.bai
-        ch_samtools_stats         = BAM_MARKDUPLICATES_PICARD.out.stats
-        ch_samtools_flagstat      = BAM_MARKDUPLICATES_PICARD.out.flagstat
-        ch_samtools_idxstats      = BAM_MARKDUPLICATES_PICARD.out.idxstats
-        ch_markduplicates_multiqc = BAM_MARKDUPLICATES_PICARD.out.metrics
-        if (params.bam_csi_index) {
-            ch_genome_bam_index = BAM_MARKDUPLICATES_PICARD.out.csi
-        }
-        ch_versions = ch_versions.mix(BAM_MARKDUPLICATES_PICARD.out.versions)
-    }
-
-
-
-
-
-
-    //
-    // MODULE: Feature biotype QC using featureCounts
-    //
-    ch_featurecounts_multiqc = Channel.empty()
-    if (!params.skip_alignment && !params.skip_qc && !params.skip_biotype_qc && biotype) {
- //update our  genome reference gtf file after applying GTFINSERT module
-    //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
-        GTFINSERT.out.final_gtf
-            .map { it[1] } // extact the path from the tuple
-            .map { WorkflowRnaseq.biotypeInGtf(it, biotype, log) }
-            .set { biotype_in_gtf }
-
-        // Prevent any samples from running if GTF file doesn't have a valid biotype
-
-        //update our  genome reference gtf file after applying GTFINSERT module
-    //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
-        ch_genome_bam
-            .combine(GTFINSERT.out.final_gtf.map { it -> it[1]})
-            .combine(biotype_in_gtf)
-            .filter { it[-1] }
-            .map { it[0..<it.size()-1] }
-            .set { ch_featurecounts }
-
-        SUBREAD_FEATURECOUNTS (
-            ch_featurecounts
-        )
-        ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
-
-        MULTIQC_CUSTOM_BIOTYPE (
-            SUBREAD_FEATURECOUNTS.out.counts,
-            ch_biotypes_header_multiqc
-        )
-        ch_featurecounts_multiqc = MULTIQC_CUSTOM_BIOTYPE.out.tsv
-        ch_versions = ch_versions.mix(MULTIQC_CUSTOM_BIOTYPE.out.versions.first())
-    }
-
-    //
-    // MODULE: Genome-wide coverage with BEDTools
-    //
-    if (!params.skip_alignment && !params.skip_bigwig) {
-
-        BEDTOOLS_GENOMECOV (
-            ch_genome_bam
-        )
-        ch_versions = ch_versions.mix(BEDTOOLS_GENOMECOV.out.versions.first())
-
-        //
-        // SUBWORKFLOW: Convert bedGraph to bigWig
-        //
-        BEDGRAPH_BEDCLIP_BEDGRAPHTOBIGWIG_FORWARD (
-            BEDTOOLS_GENOMECOV.out.bedgraph_forward,
-            PREPARE_GENOME.out.chrom_sizes
-        )
-        ch_versions = ch_versions.mix(BEDGRAPH_BEDCLIP_BEDGRAPHTOBIGWIG_FORWARD.out.versions)
-
-        BEDGRAPH_BEDCLIP_BEDGRAPHTOBIGWIG_REVERSE (
-            BEDTOOLS_GENOMECOV.out.bedgraph_reverse,
-            PREPARE_GENOME.out.chrom_sizes
-        )
-    }
-
-    //
-    // MODULE: Downstream QC steps
-    //
-    ch_qualimap_multiqc           = Channel.empty()
-    ch_dupradar_multiqc           = Channel.empty()
-    ch_bamstat_multiqc            = Channel.empty()
-    ch_inferexperiment_multiqc    = Channel.empty()
-    ch_innerdistance_multiqc      = Channel.empty()
-    ch_junctionannotation_multiqc = Channel.empty()
-    ch_junctionsaturation_multiqc = Channel.empty()
-    ch_readdistribution_multiqc   = Channel.empty()
-    ch_readduplication_multiqc    = Channel.empty()
-    ch_fail_strand_multiqc        = Channel.empty()
-    ch_tin_multiqc                = Channel.empty()
-    if (!params.skip_alignment && !params.skip_qc) {
-        if (!params.skip_qualimap) {
-                  //update our  genome reference gtf file after applying GTFINSERT module
-    //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
-            QUALIMAP_RNASEQ (
-                ch_genome_bam,
-                GTFINSERT.out.final_gtf
-                //.map { [[:], it ] }
-            )
-            ch_qualimap_multiqc = QUALIMAP_RNASEQ.out.results
-            ch_versions = ch_versions.mix(QUALIMAP_RNASEQ.out.versions.first())
-        }
-             //update our  genome reference gtf file after applying GTFINSERT module
-    //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
-
-
-    ch_genome_bam.view { item ->
-        println("ch_genome_bam item: $item")
-        println("Type: ${item.getClass()}")
-    }
-
-    GTFINSERT.out.final_gtf.view { gtf ->
-        println("GTFINSERT.out.final_gtf: $gtf")
-        println("Type: ${gtf.getClass()}")
-    }
-
-        if (!params.skip_dupradar) {
-            DUPRADAR (
-                ch_genome_bam,
-                GTFINSERT.out.final_gtf.map { it -> it[1]}
-            )
-            ch_dupradar_multiqc = DUPRADAR.out.multiqc
-            ch_versions = ch_versions.mix(DUPRADAR.out.versions.first())
-        }
-
-        if (!params.skip_rseqc && rseqc_modules.size() > 0) {
-            BAM_RSEQC (
-                ch_genome_bam.join(ch_genome_bam_index, by: [0]),
-                PREPARE_GENOME.out.gene_bed,
-                rseqc_modules
-            )
-            ch_bamstat_multiqc            = BAM_RSEQC.out.bamstat_txt
-            ch_inferexperiment_multiqc    = BAM_RSEQC.out.inferexperiment_txt
-            ch_innerdistance_multiqc      = BAM_RSEQC.out.innerdistance_freq
-            ch_junctionannotation_multiqc = BAM_RSEQC.out.junctionannotation_log
-            ch_junctionsaturation_multiqc = BAM_RSEQC.out.junctionsaturation_rscript
-            ch_readdistribution_multiqc   = BAM_RSEQC.out.readdistribution_txt
-            ch_readduplication_multiqc    = BAM_RSEQC.out.readduplication_pos_xls
-            ch_tin_multiqc                = BAM_RSEQC.out.tin_txt
-            ch_versions = ch_versions.mix(BAM_RSEQC.out.versions)
-
-            ch_inferexperiment_multiqc
-                .map {
-                    meta, strand_log ->
-                        def inferred_strand = WorkflowRnaseq.getInferexperimentStrandedness(strand_log, 30)
-                        pass_strand_check[meta.id] = true
-                        if (meta.strandedness != inferred_strand[0]) {
-                            pass_strand_check[meta.id] = false
-                            return [ "$meta.id\t$meta.strandedness\t${inferred_strand.join('\t')}" ]
-                        }
-                }
-                .collect()
-                .map {
-                    tsv_data ->
-                        def header = [
-                            "Sample",
-                            "Provided strandedness",
-                            "Inferred strandedness",
-                            "Sense (%)",
-                            "Antisense (%)",
-                            "Undetermined (%)"
-                        ]
-                        WorkflowRnaseq.multiqcTsvFromList(tsv_data, header)
-                }
-                .set { ch_fail_strand_multiqc }
-        }
-    }
-
-    //
-    // SUBWORKFLOW: Pseudo-alignment and quantification with Salmon
-    //
-    ch_salmon_multiqc                   = Channel.empty()
-    ch_pseudoaligner_pca_multiqc        = Channel.empty()
-    ch_pseudoaligner_clustering_multiqc = Channel.empty()
-    if (!params.skip_pseudo_alignment && params.pseudo_aligner == 'salmon') {
-                   //update our  genome reference gtf file after applying GTFINSERT module
-    //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
-    //when official pipeline use ch_dummy_file, the ch_dummy_file is empty, they just set transcript_fasta empty
-
-       /*  QUANTIFY_SALMON (
-            ch_filtered_reads,
-            PREPARE_GENOME.out.salmon_index,
-            ch_dummy_file,
-            GTFINSERT.out.final_gtf,
-            false,
-            params.salmon_quant_libtype ?: ''
-        )
-        ch_salmon_multiqc = QUANTIFY_SALMON.out.results
-        ch_versions = ch_versions.mix(QUANTIFY_SALMON.out.versions)
-
-        if (!params.skip_qc & !params.skip_deseq2_qc) {
-            DESEQ2_QC_SALMON (
-                QUANTIFY_SALMON.out.counts_gene_length_scaled,
-                ch_pca_header_multiqc,
-                ch_clustering_header_multiqc
-            )
-            ch_pseudoaligner_pca_multiqc        = DESEQ2_QC_SALMON.out.pca_multiqc
-            ch_pseudoaligner_clustering_multiqc = DESEQ2_QC_SALMON.out.dists_multiqc
-            ch_versions = ch_versions.mix(DESEQ2_QC_SALMON.out.versions)
-        } */
-    }
-
-    //
-    // MODULE: Pipeline reporting
-    //
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
-
-    //
-    // MODULE: MultiQC
-    //
-    if (!params.skip_multiqc) {
-        workflow_summary    = WorkflowRnaseq.paramsSummaryMultiqc(workflow, summary_params)
-        ch_workflow_summary = Channel.value(workflow_summary)
-
-        methods_description    = WorkflowRnaseq.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
-        ch_methods_description = Channel.value(methods_description)
-
-        MULTIQC (
-            ch_multiqc_config,
-            ch_multiqc_custom_config.collect().ifEmpty([]),
-            CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
-            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
-            ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'),
-            ch_multiqc_logo.collect().ifEmpty([]),
-            ch_fail_trimming_multiqc.collectFile(name: 'fail_trimmed_samples_mqc.tsv').ifEmpty([]),
-            //ch_fail_mapping_multiqc.collectFile(name: 'fail_mapped_samples_mqc.tsv').ifEmpty([]),
-            ch_fail_strand_multiqc.collectFile(name: 'fail_strand_check_mqc.tsv').ifEmpty([]),
-            ch_fastqc_raw_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_fastqc_trim_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_trim_log_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_sortmerna_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_star_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_hisat2_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_rsem_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_salmon_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_samtools_stats.collect{it[1]}.ifEmpty([]),
-            ch_samtools_flagstat.collect{it[1]}.ifEmpty([]),
-            ch_samtools_idxstats.collect{it[1]}.ifEmpty([]),
-            ch_markduplicates_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_featurecounts_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_aligner_pca_multiqc.collect().ifEmpty([]),
-            ch_aligner_clustering_multiqc.collect().ifEmpty([]),
-            ch_pseudoaligner_pca_multiqc.collect().ifEmpty([]),
-            ch_pseudoaligner_clustering_multiqc.collect().ifEmpty([]),
-            ch_preseq_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_qualimap_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_dupradar_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_bamstat_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_inferexperiment_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_innerdistance_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_junctionannotation_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_junctionsaturation_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_readdistribution_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_readduplication_multiqc.collect{it[1]}.ifEmpty([]),
-            ch_tin_multiqc.collect{it[1]}.ifEmpty([])
-        )
-        multiqc_report = MULTIQC.out.report.toList()
-
-    }
-
-}
+//     //
+//     // Filter channels to get samples that passed STAR minimum mapping percentage
+//     //
+//     ch_fail_mapping_multiqc = Channel.empty()
+//     if (!params.skip_alignment && params.aligner.contains('star')) {
+//         ch_star_multiqc
+//             .map { meta, align_log -> [ meta ] + WorkflowRnaseq.getStarPercentMapped(params, align_log) }
+//             .set { ch_percent_mapped }
+
+//         ch_genome_bam
+//             .join(ch_percent_mapped, by: [0])
+//             .map { meta, ofile, mapped, pass -> if (pass) [ meta, ofile ] }
+//             .set { ch_genome_bam }
+
+//         ch_genome_bam_index
+//             .join(ch_percent_mapped, by: [0])
+//             .map { meta, ofile, mapped, pass -> if (pass) [ meta, ofile ] }
+//             .set { ch_genome_bam_index }
+
+//         ch_percent_mapped
+//             .branch { meta, mapped, pass ->
+//                 pass: pass
+//                     pass_mapped_reads[meta.id] = true
+//                     return [ "$meta.id\t$mapped" ]
+//                 fail: !pass
+//                     pass_mapped_reads[meta.id] = false
+//                     return [ "$meta.id\t$mapped" ]
+//             }
+//             .set { ch_pass_fail_mapped }
+
+//         ch_pass_fail_mapped
+//             .fail
+//             .collect()
+//             .map {
+//                 tsv_data ->
+//                     def header = ["Sample", "STAR uniquely mapped reads (%)"]
+//                     WorkflowRnaseq.multiqcTsvFromList(tsv_data, header)
+//             }
+//             .set { ch_fail_mapping_multiqc }
+//     }
+
+//     //
+//     // MODULE: Run Preseq
+//     // skip_qc = false skip_preseq true
+
+//    /*  ch_preseq_multiqc = Channel.empty()
+//     if (!params.skip_alignment && !params.skip_qc && !params.skip_preseq) {
+//         PRESEQ_LCEXTRAP (
+//             ch_genome_bam
+//         )
+//         ch_preseq_multiqc = PRESEQ_LCEXTRAP.out.lc_extrap
+//         ch_versions = ch_versions.mix(PRESEQ_LCEXTRAP.out.versions.first())
+//     }
+//  */
+
+//     //
+//     // SUBWORKFLOW: Mark duplicate reads
+//     //
+//     ch_markduplicates_multiqc = Channel.empty()
+//     if (!params.skip_alignment && !params.skip_markduplicates && !params.with_umi) {
+//         BAM_MARKDUPLICATES_PICARD (
+//             ch_genome_bam,
+//             PREPARE_GENOME.out.fasta.map { [ [:], it ] },
+//             PREPARE_GENOME.out.fai.map { [ [:], it ] }
+//         )
+//         ch_genome_bam             = BAM_MARKDUPLICATES_PICARD.out.bam
+//         ch_genome_bam_index       = BAM_MARKDUPLICATES_PICARD.out.bai
+//         ch_samtools_stats         = BAM_MARKDUPLICATES_PICARD.out.stats
+//         ch_samtools_flagstat      = BAM_MARKDUPLICATES_PICARD.out.flagstat
+//         ch_samtools_idxstats      = BAM_MARKDUPLICATES_PICARD.out.idxstats
+//         ch_markduplicates_multiqc = BAM_MARKDUPLICATES_PICARD.out.metrics
+//         if (params.bam_csi_index) {
+//             ch_genome_bam_index = BAM_MARKDUPLICATES_PICARD.out.csi
+//         }
+//         ch_versions = ch_versions.mix(BAM_MARKDUPLICATES_PICARD.out.versions)
+//     }
+
+
+
+
+
+
+//     //
+//     // MODULE: Feature biotype QC using featureCounts
+//     //
+//     ch_featurecounts_multiqc = Channel.empty()
+//     if (!params.skip_alignment && !params.skip_qc && !params.skip_biotype_qc && biotype) {
+//  //update our  genome reference gtf file after applying GTFINSERT module
+//     //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
+//         GTFINSERT.out.final_gtf
+//             .map { it[1] } // extact the path from the tuple
+//             .map { WorkflowRnaseq.biotypeInGtf(it, biotype, log) }
+//             .set { biotype_in_gtf }
+
+//         // Prevent any samples from running if GTF file doesn't have a valid biotype
+
+//         //update our  genome reference gtf file after applying GTFINSERT module
+//     //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
+//         ch_genome_bam
+//             .combine(GTFINSERT.out.final_gtf.map { it -> it[1]})
+//             .combine(biotype_in_gtf)
+//             .filter { it[-1] }
+//             .map { it[0..<it.size()-1] }
+//             .set { ch_featurecounts }
+
+//         SUBREAD_FEATURECOUNTS (
+//             ch_featurecounts
+//         )
+//         ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
+
+//         MULTIQC_CUSTOM_BIOTYPE (
+//             SUBREAD_FEATURECOUNTS.out.counts,
+//             ch_biotypes_header_multiqc
+//         )
+//         ch_featurecounts_multiqc = MULTIQC_CUSTOM_BIOTYPE.out.tsv
+//         ch_versions = ch_versions.mix(MULTIQC_CUSTOM_BIOTYPE.out.versions.first())
+//     }
+
+//     //
+//     // MODULE: Genome-wide coverage with BEDTools
+//     //
+//     if (!params.skip_alignment && !params.skip_bigwig) {
+
+//         BEDTOOLS_GENOMECOV (
+//             ch_genome_bam
+//         )
+//         ch_versions = ch_versions.mix(BEDTOOLS_GENOMECOV.out.versions.first())
+
+//         //
+//         // SUBWORKFLOW: Convert bedGraph to bigWig
+//         //
+//         BEDGRAPH_BEDCLIP_BEDGRAPHTOBIGWIG_FORWARD (
+//             BEDTOOLS_GENOMECOV.out.bedgraph_forward,
+//             PREPARE_GENOME.out.chrom_sizes
+//         )
+//         ch_versions = ch_versions.mix(BEDGRAPH_BEDCLIP_BEDGRAPHTOBIGWIG_FORWARD.out.versions)
+
+//         BEDGRAPH_BEDCLIP_BEDGRAPHTOBIGWIG_REVERSE (
+//             BEDTOOLS_GENOMECOV.out.bedgraph_reverse,
+//             PREPARE_GENOME.out.chrom_sizes
+//         )
+//     }
+
+//     //
+//     // MODULE: Downstream QC steps
+//     //
+//     ch_qualimap_multiqc           = Channel.empty()
+//     ch_dupradar_multiqc           = Channel.empty()
+//     ch_bamstat_multiqc            = Channel.empty()
+//     ch_inferexperiment_multiqc    = Channel.empty()
+//     ch_innerdistance_multiqc      = Channel.empty()
+//     ch_junctionannotation_multiqc = Channel.empty()
+//     ch_junctionsaturation_multiqc = Channel.empty()
+//     ch_readdistribution_multiqc   = Channel.empty()
+//     ch_readduplication_multiqc    = Channel.empty()
+//     ch_fail_strand_multiqc        = Channel.empty()
+//     ch_tin_multiqc                = Channel.empty()
+//     if (!params.skip_alignment && !params.skip_qc) {
+//         if (!params.skip_qualimap) {
+//                   //update our  genome reference gtf file after applying GTFINSERT module
+//     //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
+//             QUALIMAP_RNASEQ (
+//                 ch_genome_bam,
+//                 GTFINSERT.out.final_gtf
+//                 //.map { [[:], it ] }
+//             )
+//             ch_qualimap_multiqc = QUALIMAP_RNASEQ.out.results
+//             ch_versions = ch_versions.mix(QUALIMAP_RNASEQ.out.versions.first())
+//         }
+//              //update our  genome reference gtf file after applying GTFINSERT module
+//     //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
+
+
+//     ch_genome_bam.view { item ->
+//         println("ch_genome_bam item: $item")
+//         println("Type: ${item.getClass()}")
+//     }
+
+//     GTFINSERT.out.final_gtf.view { gtf ->
+//         println("GTFINSERT.out.final_gtf: $gtf")
+//         println("Type: ${gtf.getClass()}")
+//     }
+
+//         if (!params.skip_dupradar) {
+//             DUPRADAR (
+//                 ch_genome_bam,
+//                 GTFINSERT.out.final_gtf.map { it -> it[1]}
+//             )
+//             ch_dupradar_multiqc = DUPRADAR.out.multiqc
+//             ch_versions = ch_versions.mix(DUPRADAR.out.versions.first())
+//         }
+
+//         if (!params.skip_rseqc && rseqc_modules.size() > 0) {
+//             BAM_RSEQC (
+//                 ch_genome_bam.join(ch_genome_bam_index, by: [0]),
+//                 PREPARE_GENOME.out.gene_bed,
+//                 rseqc_modules
+//             )
+//             ch_bamstat_multiqc            = BAM_RSEQC.out.bamstat_txt
+//             ch_inferexperiment_multiqc    = BAM_RSEQC.out.inferexperiment_txt
+//             ch_innerdistance_multiqc      = BAM_RSEQC.out.innerdistance_freq
+//             ch_junctionannotation_multiqc = BAM_RSEQC.out.junctionannotation_log
+//             ch_junctionsaturation_multiqc = BAM_RSEQC.out.junctionsaturation_rscript
+//             ch_readdistribution_multiqc   = BAM_RSEQC.out.readdistribution_txt
+//             ch_readduplication_multiqc    = BAM_RSEQC.out.readduplication_pos_xls
+//             ch_tin_multiqc                = BAM_RSEQC.out.tin_txt
+//             ch_versions = ch_versions.mix(BAM_RSEQC.out.versions)
+
+//             ch_inferexperiment_multiqc
+//                 .map {
+//                     meta, strand_log ->
+//                         def inferred_strand = WorkflowRnaseq.getInferexperimentStrandedness(strand_log, 30)
+//                         pass_strand_check[meta.id] = true
+//                         if (meta.strandedness != inferred_strand[0]) {
+//                             pass_strand_check[meta.id] = false
+//                             return [ "$meta.id\t$meta.strandedness\t${inferred_strand.join('\t')}" ]
+//                         }
+//                 }
+//                 .collect()
+//                 .map {
+//                     tsv_data ->
+//                         def header = [
+//                             "Sample",
+//                             "Provided strandedness",
+//                             "Inferred strandedness",
+//                             "Sense (%)",
+//                             "Antisense (%)",
+//                             "Undetermined (%)"
+//                         ]
+//                         WorkflowRnaseq.multiqcTsvFromList(tsv_data, header)
+//                 }
+//                 .set { ch_fail_strand_multiqc }
+//         }
+//     }
+
+//     //
+//     // SUBWORKFLOW: Pseudo-alignment and quantification with Salmon
+//     //
+//     ch_salmon_multiqc                   = Channel.empty()
+//     ch_pseudoaligner_pca_multiqc        = Channel.empty()
+//     ch_pseudoaligner_clustering_multiqc = Channel.empty()
+//     if (!params.skip_pseudo_alignment && params.pseudo_aligner == 'salmon') {
+//                    //update our  genome reference gtf file after applying GTFINSERT module
+//     //using  GTFINSERT.out.final_gtf to replace PREPARE_GENOME.out.gtf
+//     //when official pipeline use ch_dummy_file, the ch_dummy_file is empty, they just set transcript_fasta empty
+
+//        /*  QUANTIFY_SALMON (
+//             ch_filtered_reads,
+//             PREPARE_GENOME.out.salmon_index,
+//             ch_dummy_file,
+//             GTFINSERT.out.final_gtf,
+//             false,
+//             params.salmon_quant_libtype ?: ''
+//         )
+//         ch_salmon_multiqc = QUANTIFY_SALMON.out.results
+//         ch_versions = ch_versions.mix(QUANTIFY_SALMON.out.versions)
+
+//         if (!params.skip_qc & !params.skip_deseq2_qc) {
+//             DESEQ2_QC_SALMON (
+//                 QUANTIFY_SALMON.out.counts_gene_length_scaled,
+//                 ch_pca_header_multiqc,
+//                 ch_clustering_header_multiqc
+//             )
+//             ch_pseudoaligner_pca_multiqc        = DESEQ2_QC_SALMON.out.pca_multiqc
+//             ch_pseudoaligner_clustering_multiqc = DESEQ2_QC_SALMON.out.dists_multiqc
+//             ch_versions = ch_versions.mix(DESEQ2_QC_SALMON.out.versions)
+//         } */
+//     }
+
+//     //
+//     // MODULE: Pipeline reporting
+//     //
+//     CUSTOM_DUMPSOFTWAREVERSIONS (
+//         ch_versions.unique().collectFile(name: 'collated_versions.yml')
+//     )
+
+//     //
+//     // MODULE: MultiQC
+//     //
+//     if (!params.skip_multiqc) {
+//         workflow_summary    = WorkflowRnaseq.paramsSummaryMultiqc(workflow, summary_params)
+//         ch_workflow_summary = Channel.value(workflow_summary)
+
+//         methods_description    = WorkflowRnaseq.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
+//         ch_methods_description = Channel.value(methods_description)
+
+//         MULTIQC (
+//             ch_multiqc_config,
+//             ch_multiqc_custom_config.collect().ifEmpty([]),
+//             CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
+//             ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
+//             ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'),
+//             ch_multiqc_logo.collect().ifEmpty([]),
+//             ch_fail_trimming_multiqc.collectFile(name: 'fail_trimmed_samples_mqc.tsv').ifEmpty([]),
+//             //ch_fail_mapping_multiqc.collectFile(name: 'fail_mapped_samples_mqc.tsv').ifEmpty([]),
+//             ch_fail_strand_multiqc.collectFile(name: 'fail_strand_check_mqc.tsv').ifEmpty([]),
+//             ch_fastqc_raw_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_fastqc_trim_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_trim_log_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_sortmerna_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_star_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_hisat2_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_rsem_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_salmon_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_samtools_stats.collect{it[1]}.ifEmpty([]),
+//             ch_samtools_flagstat.collect{it[1]}.ifEmpty([]),
+//             ch_samtools_idxstats.collect{it[1]}.ifEmpty([]),
+//             ch_markduplicates_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_featurecounts_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_aligner_pca_multiqc.collect().ifEmpty([]),
+//             ch_aligner_clustering_multiqc.collect().ifEmpty([]),
+//             ch_pseudoaligner_pca_multiqc.collect().ifEmpty([]),
+//             ch_pseudoaligner_clustering_multiqc.collect().ifEmpty([]),
+//             ch_preseq_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_qualimap_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_dupradar_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_bamstat_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_inferexperiment_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_innerdistance_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_junctionannotation_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_junctionsaturation_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_readdistribution_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_readduplication_multiqc.collect{it[1]}.ifEmpty([]),
+//             ch_tin_multiqc.collect{it[1]}.ifEmpty([])
+//         )
+//         multiqc_report = MULTIQC.out.report.toList()
+
+//     }
+
+// }
 
 
 /*
@@ -1487,7 +1488,8 @@ By now, you should be on the `StringTieMerge` branch on your remote server, and 
 // cd /mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert
 // scp -r -i /Users/dxu/jfs_ssh.key root@52.4.91.19:/mnt/jfs/nextflow/dxu/axolotl2samples_GTFInsert/18/86f5460dcc30bc577b0aeba1ccec4e/14-09158-4A_ATGCCT_L002.combined.gtf /Users/dxu/Documents/compareJoelGTFwithMyGTF/updateGeneID/outputFromGffcompare/
 // origin gtf in json parameter "gtf": "s3://biocore-data/JamesGodwin/jgodwin_001/gtfFile/AmexT_v47-AmexG_v6.0-DD_fromAxolotlOmics_addmcherry.gtf",
-//  "gtf": "s3://biocore-data/JamesGodwin/jgodwin_001/gtfFile/completedGtfInsertTwoAxolotSample.gtf", 
+//  "gtf": "s3://biocore-data/JamesGodwin/jgodwin_001/gtfFile/completedGtfInsertTwoAxolotSample.gtf",
+// "gtf": "s3://biocore-data/JamesGodwin/jgodwin_001/gtfFile/completedGtfInsertTwoAxolotSample_not_lastest_omics_version.gtf"
 //No index
 //  "salmon_index" : "s3://biocore-data/JamesGodwin/jgodwin_001/AxolotlSalmonIndexFromREPARE_GENOME_SALMON_INDEX/",
 //    "star_index" : "s3://biocore-data/JamesGodwin/jgodwin_001/AxolotlStarIndex/",
